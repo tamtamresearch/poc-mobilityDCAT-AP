@@ -1,0 +1,7 @@
+# Generated build artefacts — produced by src/scripts/run-all.sh
+dist/tables/
+dist/*.ttl
+dist/*.jsonld
+
+# Keep dist/ itself tracked via .gitkeep
+!dist/.gitkeep
