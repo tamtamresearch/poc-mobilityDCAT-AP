@@ -1,6 +1,12 @@
-# src/ — mobilityDCAT-AP Source Files
+# mobilityDCAT-AP — Repository Structure POC
 
-This directory contains all **hand-authored** source files for a single version of the mobilityDCAT-AP specification. Generated artefacts live in `dist/` and must not be edited by hand.
+> **This is a proof of concept** demonstrating a proposed repository layout and GitHub Actions publishing workflow for mobilityDCAT-AP. It is not the authoritative specification repository.
+>
+> The goal is to validate the branch-based versioning strategy (see `PLAN.md`) before applying it to the main repo.
+
+## Source files
+
+All hand-authored source files live in `src/`. Generated artefacts go in `dist/` and must not be edited by hand.
 
 ## Structure
 

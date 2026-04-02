@@ -1,0 +1,81 @@
+name: Build and publish — release/* (releases/vX.Y.Z)
+
+# Triggered on push to any release/* branch or manually.
+# Branch name convention: release/1.0.0
+#
+# Publishes to gh-pages under:
+#   releases/1.0.0/   — the versioned copy
+#   releases/latest/  — always points to the newest release
+#
+# Also creates a GitHub Release with the built docs as a zip artefact.
+
+on:
+  push:
+    branches: ['release/*']
+  workflow_dispatch:
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # required by peaceiris/actions-gh-pages and softprops/action-gh-release
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Extract version from branch name
+        # release/1.0.0 → VERSION=1.0.0
+        run: echo "VERSION=${GITHUB_REF_NAME#release/}" >> $GITHUB_ENV
+
+      # -----------------------------------------------------------------------
+      # BUILD — placeholder. See build-main.yml for the full replacement block.
+      # -----------------------------------------------------------------------
+      - name: Copy source files to dist  # placeholder build
+        run: |
+          mkdir -p dist/tables dist/examples dist/figures dist/js
+
+          cp src/index.html dist/
+          cp src/config.js  dist/
+
+          cp src/mobilitydcat-ap.rdf dist/ 2>/dev/null || true
+
+          cp src/tables/mandatory-classes.html            dist/tables/ 2>/dev/null || true
+          cp src/tables/recommended-classes.html          dist/tables/ 2>/dev/null || true
+          cp src/tables/optional-classes.html             dist/tables/ 2>/dev/null || true
+          cp src/tables/deprecated-classes.html           dist/tables/ 2>/dev/null || true
+          cp src/tables/mandatory-properties-for-*.html   dist/tables/ 2>/dev/null || true
+          cp src/tables/recommended-properties-for-*.html dist/tables/ 2>/dev/null || true
+          cp src/tables/optional-properties-for-*.html    dist/tables/ 2>/dev/null || true
+          cp src/tables/deprecated-properties-for-*.html  dist/tables/ 2>/dev/null || true
+
+          cp src/examples/*.rdf dist/examples/ 2>/dev/null || true
+
+          cp -r src/figures/. dist/figures/ 2>/dev/null || true
+          cp -r src/js/.      dist/js/      2>/dev/null || true
+
+      - name: Deploy to gh-pages — releases/${{ env.VERSION }}
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: dist
+          destination_dir: releases/${{ env.VERSION }}
+          keep_files: true
+
+      - name: Deploy to gh-pages — releases/latest
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: dist
+          destination_dir: releases/latest
+          keep_files: true
+
+      - name: Package built docs
+        run: zip -r docs-${{ env.VERSION }}.zip dist/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ env.VERSION }}
+          name: mobilityDCAT-AP ${{ env.VERSION }}
+          files: docs-${{ env.VERSION }}.zip
