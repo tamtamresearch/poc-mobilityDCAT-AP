@@ -48,17 +48,28 @@ src/
 
 ## Branching convention
 
-| Branch | Contents |
-|--------|----------|
-| `main` | Latest draft in progress |
-| `release/vX.Y` | Frozen approved version |
-| `draft/topic-name` | Parallel topic work, PR'd into `main` |
+| Ref | Type | Published to |
+|-----|------|-------------|
+| `main` | Latest draft | `drafts/latest/` |
+| `release/1.0.0` | Release branch | `releases/1.0.0/` + `releases/latest/` |
+| `draft/1.0.0-draft-0.1` | Draft tag | `drafts/1.0.0-draft-0.1/` |
 
-## Building
+## GitHub Actions workflows
+
+Workflows live in `.github/workflows/` and publish to the `gh-pages` branch.
+
+| Workflow | Trigger | Publishes to | GitHub Release |
+|----------|---------|-------------|----------------|
+| `build-main.yml` | push to `main`, manual | `drafts/latest/` | — |
+| `build-release.yml` | push to `release/*`, manual | `releases/X.Y.Z/` + `releases/latest/` | full release |
+| `build-draft.yml` | push of `draft/*` tag, manual | `drafts/X.Y.Z-draft-A.B/` | pre-release |
+
+> **Note:** The build step is currently a placeholder (file copy). The real build scripts in `src/scripts/` are not yet wired up. See the workflow files for details.
+
+## Building locally
 
 ```bash
-cd src/scripts
-./run-all.sh
+bash src/scripts/run-all.sh
 ```
 
 Output lands in `dist/` at the repository root.
