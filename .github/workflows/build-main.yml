@@ -18,38 +18,18 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
-      # -----------------------------------------------------------------------
-      # BUILD — placeholder until the build system is wired up.
-      #
-      # Replace this entire step with the real build once ready:
-      #
-      #   - name: Setup PHP
-      #     uses: shivammathur/setup-php@v2
-      #     with:
-      #       php-version: '8.2'
-      #
-      #   - name: Install rdflib (for serialise-vocabulary.sh / serialise-examples.sh)
-      #     run: pip install rdflib
-      #
-      #   - name: Build
-      #     run: bash src/scripts/run-all.sh
-      #
-      # The real build produces these additional outputs (not present yet):
-      #   dist/mobilitydcat-ap.ttl
-      #   dist/mobilitydcat-ap.jsonld
-      #   dist/tables/class-*.html
-      #   dist/tables/quick-reference-*.html
-      #   dist/tables/mobilitydcat-ap-classes-and-properties.html
-      #   dist/tables/deprecated-classes-and-properties.html
-      #   dist/examples/*.ttl  dist/examples/*.jsonld
-      #   dist/examples/README.md
-      # -----------------------------------------------------------------------
-      - name: Copy source files to dist  # placeholder build
+      - name: Build spec with ReSpec
+        uses: w3c/spec-prod@v2
+        with:
+          TOOLCHAIN: respec
+          SOURCE: src/index.html
+          DESTINATION: dist/index.html
+
+      - name: Copy source files to dist
         run: |
           mkdir -p dist/tables dist/examples dist/figures dist/js
 
-          # Spec entry point and ReSpec config
-          cp src/index.html dist/
+          # ReSpec config
           cp src/config.js  dist/
 
           # Ontology source (RDF/XML)

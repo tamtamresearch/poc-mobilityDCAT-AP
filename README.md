@@ -51,7 +51,7 @@ src/
 | Ref | Type | Published to |
 |-----|------|-------------|
 | `main` | Latest draft | `drafts/latest/` |
-| `release/1.0.0` | Release branch | `releases/1.0.0/` + `releases/latest/` |
+| `release/1.0.0` | Release branch | `releases/1.0.0/` + conditionally `releases/latest/` |
 | `draft/1.0.0-draft-0.1` | Draft tag | `drafts/1.0.0-draft-0.1/` |
 
 ## GitHub Actions workflows

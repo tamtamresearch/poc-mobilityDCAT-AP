@@ -30,14 +30,17 @@ jobs:
         # draft/1.0.0-draft-0.1 → VERSION=1.0.0-draft-0.1
         run: echo "VERSION=${GITHUB_REF_NAME#draft/}" >> $GITHUB_ENV
 
-      # -----------------------------------------------------------------------
-      # BUILD — placeholder. See build-main.yml for the full replacement block.
-      # -----------------------------------------------------------------------
-      - name: Copy source files to dist  # placeholder build
+      - name: Build spec with ReSpec
+        uses: w3c/spec-prod@v2
+        with:
+          TOOLCHAIN: respec
+          SOURCE: src/index.html
+          DESTINATION: dist/index.html
+
+      - name: Copy source files to dist
         run: |
           mkdir -p dist/tables dist/examples dist/figures dist/js
 
-          cp src/index.html dist/
           cp src/config.js  dist/
 
           cp src/mobilitydcat-ap.rdf dist/ 2>/dev/null || true
