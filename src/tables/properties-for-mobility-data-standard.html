@@ -51,34 +51,53 @@ Property name and URI</p>
 </tr> 
 
 
-
-  
-<tr class="property" id="mobility-data-standard-standard-name">
-<td valign=top>
-<p>+standard name</p>
+<tr class="property" id="mobility-data-standard-conforms-to">
+ <td valign=top>
+<p>+conforms to</p>
 <p><a href="https://www.dublincore.org/specifications/dublin-core/dcmi-terms/#conformsTo"><code>dct:conformsTo</code></a></p>
 </td>
 <td valign=top>
-<p><a href="#class-concept"><code>skos:Concept</code></a></p>
+<p><a href="#class-standard"><code>dct:Standard</code></a></p>
 </td>
 <td valign=top>
-<p>0..1</p>
+<p>0..*</p>
 </td>
 <td valign=top>
-<p>The name of the mobility data standard.</p>
+<p>Reference to the applied mobility data standard, as well as to individual/national/content-specific profiles or representations of the applied standard.</p>
 </td>
 <td valign=top>
-  <p>A corresponding <a href="#vocab-mobility-data-standard">controlled vocabulary</a> is provided.</p>
-  <p>This property is necessary for the following CASE 1:</p>
-  <p>A custom instance of class <a href="#class-mobility-data-standard"><code>mobilitydcatap:MobilityDataStandard</code></a> is defined. 
-    Such custom instance is recommended when the mobility data standard is detailed out via properties <a href="#mobility-data-standard-version"><code>owl:versionInfo</code></a> and/or <a href="#mobility-data-standard-schema"><code>mobilitydcatap:schema</code></a>. 
-  This property would then name the mobility data standard via a controlled vocabulary.</p>
-  <p>In the alternative CASE 2, the name the mobility data standard is directly named as range of the class <a href="#class-mobility-data-standard"><code>mobilitydcatap:MobilityDataStandard</code></a> , again via the same controlled vocabulary.</p>
+  <p>This property is necessary if a custom instance of class <a href="#class-mobility-data-standard"><code>mobilitydcatap:MobilityDataStandard</code></a> is defined. 
+  This property would then reference a common mobility data standard (e.g., "NeTeX" via the <a href="#vocab-mobility-data-standard">controlled vocabulary</a>), 
+    as well as additionally further individual/national/content-specific profiles or representations of the applied standard (e.g., an Italian NeTEx profile). </p>
 </td>
 <td valign=top>
 <p>P</p>
 </td>
-</tr>  
+</tr> 
+
+  
+
+<tr class="property" id="mobility-data-standard-title">
+<td valign=top>
+<p>+title</p>
+<p><a href="https://www.dublincore.org/specifications/dublin-core/dcmi-terms/#title"><code>dct:title</code></a></p>
+</td>
+<td valign=top>
+<p><a href="#class-literal"><code>rdfs:Literal</code></a></p>
+</td>
+<td valign=top>
+<p>0..*</p>
+</td>
+<td valign=top>
+<p>A name given to the mobility data standard.</p>
+</td>
+<td valign=top>
+  <p>This property can be repeated for parallel language versions of the title  - see <a class="no-secRef" href="#accessibility-and-multilingual-aspects"></a>.</p>
+</td>
+<td valign=top>
+<p>P</p>
+</td>
+</tr> 
 
 <tr class="property" id="mobility-data-standard-version">
 <td valign=top>
@@ -102,33 +121,7 @@ Property name and URI</p>
 </td>
 </tr>    
 
-<tr class="property" id="mobility-data-standard-schema">
-<td valign=top>
-<p>+schema</p>
-<p><code>mobilitydcatap:schema</code></p>
-</td>
-<td valign=top>
-<p><a href="#class-resource"><code>rdfs:Resource</code></a></p>
-</td>
-<td valign=top>
-<p>0..*</p>
-</td>
-<td valign=top>
-<p>The schema of the mobility data standard, as applied within the delivered content. E.g., an XDS representation of a specific <a href="https://docs.datex2.eu/user-guide/Profiles/">DATEX II profile</a>. </p>
-</td>
-<td valign=top>
-  <p>This is a sub-property of <a href="https://www.dublincore.org/specifications/dublin-core/dcmi-terms/#conformsTo"><code>dct:conformsTo</code></a>.</p>
-  <p>There are different options how to reference the schema.</p>
-  <p>It might be a reference to a platform-hosted catalogue of schemas. In such case, the data platform should keep an own catalogue of commonly used schemas. 
-    The data provider should then be able to select an applicable schema from this catalogue when providing the metadata. </p>
-  <p>It might be also a reference to an individual schema that is provided by the data publisher, or a reference to an schema that is hosted externally (like a stakeholder-based DATEX II profile published on the datex2.eu page).
-  In such case, the data provider should be able to upload an own, individual schema, or to link to an external one.</p>. 
-  <p>In any case, the schema should be available as a resource.</p>
-  </td>
-<td valign=top>
-<p>P</p>
-</td>
-</tr>    
+
   
 </tbody>
 </table>

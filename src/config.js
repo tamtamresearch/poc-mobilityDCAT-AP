@@ -23,9 +23,9 @@ var respecConfig = {
     subtitle: "A mobility extension for the DCAT application profile for data portals in Europe",
     logos: [
         {
-        src: 'https://mobilitydcat-ap.github.io/respec-style/logos/mobilitydcat-ap.png',
+        src: 'https://mobilitydcat-ap.github.io/respec-style/logos/mobilityDCAT-AP-V3-logo.png',
         width: 250,
-        height: 140,
+        height: 250,
         alt: "mobilitydcat-ap logo"
   }
       ],
@@ -62,8 +62,12 @@ var respecConfig = {
       uri: "./mobilitydcat-ap.jsonld",
     },
     {
-       label: "SHACL (Turtle)",
-       uri: "./shaclShapes/mobilitydcat-ap_shacl_shapes.ttl",
+      label: "SHACL basic validation (Turtle)",
+      uri: "./shaclShapes/mobilitydcat-ap-shacl.ttl",
+    },
+    {
+      label: "SHACL range constraints (Turtle)",
+      uri: "./shaclShapes/mobilitydcat-ap-shacl-ranges.ttl",
     }
     ],
 //    implementationReportURI:"https://joinup.ec.europa.eu/document/geodcat-ap-implementations",
