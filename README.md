@@ -12,38 +12,18 @@ All hand-authored source files live in `src/`. Generated artefacts go in `dist/`
 
 ```
 src/
-├── appendices/                          # Appendix content (placeholder)
-├── config.js                            # ReSpec configuration (version, editors, dates)
-├── index.html                           # ReSpec specification document (entry point)
-├── mobilitydcat-ap.rdf                  # Ontology — primary source of truth (RDF/XML)
-├── enterpriseArchitectFiles/            # Enterprise Architect model files
-│   ├── mobilityDCAT-AP.qea              # EA project file
-│   └── readme.md
-├── examples/                            # Worked examples
-│   ├── README.md
-│   ├── *.ttl                            # Turtle examples
-│   ├── *.jsonld                         # JSON-LD examples
-│   └── SE NAP_dataset_*/               # Swedish NAP reference examples (.ttl, .xml)
-├── figures/                             # UML diagrams and visual assets
-│   └── mobilityDCAT-AP_uml-diagramm_*.png
-├── js/
-│   └── script.js                        # Custom JavaScript
-├── scripts/                             # Build tooling
-│   ├── run-all.sh                       # Top-level entry point
-│   ├── build-all.sh                     # Builds all HTML tables
-│   ├── build-class-tables.php           # Generates class/property tables from ontology
-│   ├── build-summary-tables.php         # Generates summary tables
-│   ├── build-example-index.php          # Indexes examples
-│   ├── serialise-all.sh                 # Runs all serialisation steps
-│   ├── serialise-vocabulary.sh          # Converts ontology to .ttl and .jsonld
-│   └── serialise-examples.sh            # Serialises example files
-├── shaclShapes/                         # SHACL validation constraints
-│   ├── mobilitydcat-ap_shacl_shapes.ttl
-│   └── readme.md
-└── tables/                              # HTML property tables (included by index.html)
-    ├── class-*.html                     # Per-class property tables
-    ├── mandatory/recommended/optional-properties-for-*.html
-    └── (+ summary, mapping, vocabulary tables)
+├── index.html                 # ReSpec specification document (entry point)
+├── config.js                  # ReSpec configuration
+├── mobilitydcat-ap.rdf        # Ontology — primary source of truth (RDF/XML)
+├── tables/                    # HTML property tables included by index.html
+├── examples/                  # Worked examples
+├── figures/                   # UML diagrams and logo
+├── shaclShapes/               # SHACL validation constraints
+├── validationFiles/           # Granular SHACL shapes (one per class)
+├── js/                        # Custom JavaScript
+├── scripts/                   # Build tooling (run-all.sh is the entry point)
+├── enterpriseArchitectFiles/  # EA model (.qea)
+└── appendices/                # Appendix content (placeholder)
 ```
 
 ## Branching convention
