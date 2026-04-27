@@ -51,7 +51,7 @@ src/
 | Ref | Type | Published to |
 |-----|------|-------------|
 | `main` | Latest draft | `drafts/latest/` |
-| `release/1.0.0` | Release branch | `releases/1.0.0/` + conditionally `releases/latest/` |
+| `release/1.0.0` | Release branch | `releases/1.0.0/` |
 | `draft/1.0.0-draft-0.1` | Draft tag | `drafts/1.0.0-draft-0.1/` |
 
 ## GitHub Actions workflows
@@ -61,10 +61,11 @@ Workflows live in `.github/workflows/` and publish to the `gh-pages` branch.
 | Workflow | Trigger | Publishes to | GitHub Release |
 |----------|---------|-------------|----------------|
 | `build-main.yml` | push to `main`, manual | `drafts/latest/` | — |
-| `build-release.yml` | push to `release/*`, manual | `releases/X.Y.Z/` + `releases/latest/` | full release |
+| `build-release.yml` | push to `release/*`, manual | `releases/X.Y.Z/` | full release |
 | `build-draft.yml` | push of `draft/*` tag, manual | `drafts/X.Y.Z-draft-A.B/` | pre-release |
+| `promote-latest.yml` | manual only | `releases/latest/` ← copy of chosen version | — |
 
-> **Note:** The build step is currently a placeholder (file copy). The real build scripts in `src/scripts/` are not yet wired up. See the workflow files for details.
+`releases/latest/` is **never updated automatically**. After verifying a release, run `promote-latest.yml` from the Actions tab and enter the version number (e.g. `1.0.0`). This makes promotion an explicit, deliberate step — pushing a fix to an older release branch will not silently overwrite latest.
 
 ## Building locally
 
