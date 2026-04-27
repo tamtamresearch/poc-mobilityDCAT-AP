@@ -1,0 +1,43 @@
+name: Promote release to releases/latest
+
+# Manually promote a previously published releases/X.Y.Z/ to releases/latest/.
+# Run this explicitly after verifying a release — never runs automatically.
+#
+# Usage: Actions → "Promote release to releases/latest" → Run workflow → enter version (e.g. 1.0.0)
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to promote (e.g. 1.0.0)'
+        required: true
+        type: string
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout gh-pages
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+
+      - name: Promote releases/${{ inputs.version }} to releases/latest
+        run: |
+          git config user.name  "github-actions"
+          git config user.email "github-actions@github.com"
+
+          if [ ! -d "releases/${{ inputs.version }}" ]; then
+            echo "ERROR: releases/${{ inputs.version }} does not exist on gh-pages." >&2
+            exit 1
+          fi
+
+          rm -rf releases/latest
+          cp -r releases/${{ inputs.version }}/. releases/latest/
+
+          git add -A
+          git commit -m "chore: promote releases/${{ inputs.version }} to releases/latest"
+          git push

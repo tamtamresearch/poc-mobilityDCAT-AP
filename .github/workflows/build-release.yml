@@ -5,7 +5,9 @@ name: Build and publish — release/* (releases/vX.Y.Z)
 #
 # Publishes to gh-pages under:
 #   releases/1.0.0/   — the versioned copy
-#   releases/latest/  — always points to the newest release
+#
+# releases/latest/ is NOT updated automatically. Use promote-latest.yml
+# (workflow_dispatch) to explicitly promote a version to latest.
 #
 # Also creates a GitHub Release with the built docs as a zip artefact.
 
@@ -68,14 +70,14 @@ jobs:
           ref: gh-pages
           path: gh-pages-out
 
-      - name: Clear releases/${{ env.VERSION }} and releases/latest on gh-pages
+      - name: Clear releases/${{ env.VERSION }} on gh-pages
         working-directory: gh-pages-out
         run: |
           git config user.name  "github-actions"
           git config user.email "github-actions@github.com"
-          rm -rf releases/${{ env.VERSION }} releases/latest
+          rm -rf releases/${{ env.VERSION }}
           git add -A
-          git commit -m "chore: clear releases/${{ env.VERSION }} and releases/latest before rebuild" || echo "Nothing to clear"
+          git commit -m "chore: clear releases/${{ env.VERSION }} before rebuild" || echo "Nothing to clear"
           git push
 
       - name: Deploy to gh-pages — releases/${{ env.VERSION }}
@@ -84,14 +86,6 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: dist
           destination_dir: releases/${{ env.VERSION }}
-          keep_files: true
-
-      - name: Deploy to gh-pages — releases/latest
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: dist
-          destination_dir: releases/latest
           keep_files: true
 
       - name: Package built docs
