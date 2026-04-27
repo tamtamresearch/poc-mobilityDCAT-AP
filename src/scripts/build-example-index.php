@@ -3,9 +3,9 @@
   $folder = "../examples/";
   $target = $folder . "README.md";
 
-  $ext = array(".ttl",".xml",".jsonld");
+  $ext = array(".ttl",".rdf",".jsonld");
   $label[".ttl"] = "Turtle";
-  $label[".xml"] = "RDF/XML";
+  $label[".rdf"] = "RDF/XML";
   $label[".jsonld"] = "JSON-LD";
   $file = array();
 
@@ -26,11 +26,7 @@
   foreach ($file as $fk => $fv) {
     $tbody .= '<tr>' . "\n";
     foreach ($ext as $e) {
-      if (isset($file[$fk][$e])) {
-        $tbody .= '<td><a href="./' . $file[$fk][$e] . '"><code>' . $file[$fk][$e] . '</code></a></td>' . "\n";
-      } else {
-        $tbody .= '<td></td>' . "\n";
-      }
+      $tbody .= '<td><a href="./' . $file[$fk][$e] . '"><code>' . $file[$fk][$e] . '</code></a></td>' . "\n";
     }
     $tbody .= '</tr>' . "\n";
   }
