@@ -54,9 +54,9 @@ jobs:
           SOURCE: src/index.html
           DESTINATION: dist/index.html
           # TODO: Temporarily disable validation - we MUST enable validation for release!
-          VALIDATE_INPUT_MARKUP: false
-          VALIDATE_MARKUP: false
-          # VALIDATE_LINKS: false
+#          VALIDATE_INPUT_MARKUP: false
+          VALIDATE_MARKUP: true
+          VALIDATE_LINKS: true
 
       - name: Copy built index.html into dist
         # spec-prod writes its output to a sibling directory (<repo>.common/dist/),
