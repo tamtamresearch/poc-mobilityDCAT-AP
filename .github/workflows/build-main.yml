@@ -10,42 +10,44 @@ on:
 
 jobs:
   build-and-publish:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu
     permissions:
       contents: write   # required by peaceiris/actions-gh-pages
 
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Generate ontology serializations
         run: |
           pip install rdflib
-          (cd src/scripts && bash serialise-vocabulary.sh)
+          (cd src/scripts && bash serialise-all.sh)
 
       - name: Copy source files to dist
         run: |
           mkdir -p dist/tables dist/examples dist/figures dist/js dist/shaclShapes
-
-          # ReSpec config
-          cp src/config.js  dist/
 
           # Ontology source
           cp src/mobilitydcat-ap.rdf    dist/ 2>/dev/null || true
           cp src/mobilitydcat-ap.ttl    dist/ 2>/dev/null || true
           cp src/mobilitydcat-ap.jsonld dist/ 2>/dev/null || true
 
-          # Hand-authored tables — inputs to the build scripts
-          cp src/tables/*.html dist/tables/ 2>/dev/null || true
 
           # Example source files
-          cp src/examples/*.rdf dist/examples/ 2>/dev/null || true
-          cp src/examples/*.ttl dist/examples/ 2>/dev/null || true
+          cp src/examples/*.rdf     dist/examples/ 2>/dev/null || true
+          cp src/examples/*.ttl     dist/examples/ 2>/dev/null || true
+          cp src/examples/*.jsonld  dist/examples/ 2>/dev/null || true
+          cp src/examples/*.xml     dist/examples/ 2>/dev/null || true
 
           # Static assets
           cp -r src/figures/.    dist/figures/    2>/dev/null || true
-          cp -r src/js/.         dist/js/         2>/dev/null || true
           cp -r src/shaclShapes/. dist/shaclShapes/ 2>/dev/null || true
+
+      - name: Install respec globally
+        # spec-prod installs respec locally via pnpm but the shell it spawns
+        # to run the build cannot find it. A global install makes it available
+        # system-wide regardless of what pnpm does with PATH.
+        run: npm install -g respec@36.0.0
 
       - name: Build spec with ReSpec
         uses: w3c/spec-prod@v2
@@ -53,10 +55,11 @@ jobs:
           TOOLCHAIN: respec
           SOURCE: src/index.html
           DESTINATION: dist/index.html
-          # TODO: Temporarily disable validation - we MUST enable validation for release!
-#          VALIDATE_INPUT_MARKUP: false
+          VALIDATE_INPUT_MARKUP: false
           VALIDATE_MARKUP: true
-          VALIDATE_LINKS: true
+          # Disabled until this issue is resolved (tool is not compatible with node.js 24)
+          # https://github.com/w3c/spec-prod/issues/222
+          # VALIDATE_LINKS: true
 
       - name: Copy built index.html into dist
         # spec-prod writes its output to a sibling directory (<repo>.common/dist/),
@@ -86,3 +89,9 @@ jobs:
           publish_dir: dist
           destination_dir: drafts/latest
           keep_files: true
+
+      - name: Upload built spec as artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: main-spec-built
+          path: dist/
