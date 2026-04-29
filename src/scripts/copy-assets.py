@@ -22,10 +22,9 @@ def main() -> None:
     for sub in ["examples", "figures", "shaclShapes"]:
         (DIST / sub).mkdir(parents=True, exist_ok=True)
 
-    for ext in ["rdf", "ttl", "jsonld"]:
-        copy_glob(f"mobilitydcat-ap.{ext}", DIST)
+    copy_glob("mobilitydcat-ap.rdf", DIST)
 
-    for ext in ["rdf", "ttl", "jsonld", "xml"]:
+    for ext in ["rdf", "xml"]:
         copy_glob(f"examples/*.{ext}", DIST / "examples")
 
     for sub in ["figures", "shaclShapes"]:

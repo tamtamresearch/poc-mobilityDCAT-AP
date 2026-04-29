@@ -3,7 +3,22 @@
 ## Prerequisites
 
 - [mise](https://mise.jdx.dev/) — manages Node.js and uv versions locally
-- Windows: cmd or PowerShell — no bash required
+
+All build scripts are written in Python and work identically on Windows and Linux. No bash required on either platform.
+
+### Installing mise
+
+**Linux / macOS**
+```sh
+curl https://mise.run | sh
+```
+
+**Windows** (PowerShell or cmd)
+```powershell
+winget install jdx.mise
+# or
+scoop install mise
+```
 
 ## First-time setup
 
@@ -15,13 +30,15 @@ mise run install      # npm install + uv sync (creates .venv with all Python dep
 ## Build
 
 ```sh
-mise run build        # full build: serialise RDF + build ReSpec spec -> dist/
+mise run build        # full build: serialise RDF + build ReSpec spec
 ```
+
+All output is written to **`dist/`**. Open `dist/index.html` in a browser to preview the built specification.
 
 Individual steps:
 
 ```sh
-mise run serialise    # convert src/*.rdf and src/examples/*.rdf -> .ttl + .jsonld
+mise run serialise    # convert src/*.rdf and src/examples/*.rdf -> dist/*.ttl + dist/*.jsonld
 mise run build-spec   # copy assets to dist/ and build dist/index.html via ReSpec
 ```
 
