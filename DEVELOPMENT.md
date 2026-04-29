@@ -38,6 +38,7 @@ All output is written to **`dist/`**. Open `dist/index.html` in a browser to pre
 Individual steps:
 
 ```sh
+mise run clean        # empty dist/ (run automatically at the start of mise run build)
 mise run serialise    # convert src/*.rdf and src/examples/*.rdf -> dist/*.ttl + dist/*.jsonld
 mise run build-spec   # copy assets to dist/ and build dist/index.html via ReSpec
 ```

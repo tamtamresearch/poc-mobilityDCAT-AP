@@ -15,17 +15,23 @@ run = [
   "uv sync",
 ]
 
+[tasks.clean]
+description = "Empty dist/ before a fresh build"
+run = "uv run python src/scripts/clean.py"
+
 [tasks.serialise]
 description = "Serialise RDF vocabulary and examples -> Turtle + JSON-LD"
+depends = ["clean"]
 run = "uv run python src/scripts/serialise.py"
 
 [tasks.build-spec]
 description = "Copy assets and build ReSpec HTML spec -> dist/index.html"
+depends = ["clean"]
 run = [
   "uv run python src/scripts/copy-assets.py",
   "uv run python src/scripts/build-spec.py",
 ]
 
 [tasks.build]
-description = "Full build: serialise RDF then build ReSpec spec"
+description = "Full build: clean dist/, serialise RDF, build ReSpec spec"
 depends = ["serialise", "build-spec"]

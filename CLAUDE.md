@@ -38,6 +38,7 @@ mise run build
 
 | Script | Purpose |
 |--------|---------|
+| `src/scripts/clean.py` | Empties `dist/` before a fresh build |
 | `src/scripts/serialise.py` | Converts `src/*.rdf` and `src/examples/*.rdf` to Turtle and JSON-LD using rdflib |
 | `src/scripts/copy-assets.py` | Copies ontology files, examples, figures, and SHACL shapes to `dist/` |
 | `src/scripts/build-spec.py` | Starts a local HTTP server and builds `dist/index.html` via `respec` |
