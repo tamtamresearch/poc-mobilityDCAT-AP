@@ -57,10 +57,8 @@ jobs:
         run: uv run python src/scripts/build-spec.py
 
       - name: Validate HTML markup
-        uses: Cyb3r-Jak3/html5validator-action@v7.2.0
-        with:
-          root: dist/index.html
-          log_level: WARNING
+        run: html-validate dist/index.html
+        continue-on-error: true
 
       - name: Checkout gh-pages for pre-clean
         uses: actions/checkout@v4

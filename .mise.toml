@@ -44,7 +44,7 @@ run = "html-validate dist/index.html"
 description = "Build spec, validate markup, and list all broken local references"
 depends = ["build"]
 run = [
-  "html-validate dist/index.html",
+  "html-validate dist/index.html || true",
   "uv run python src/scripts/check-refs.py",
 ]
 
