@@ -13,61 +13,54 @@ on:
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 5  # avoids runaway jobs
+    timeout-minutes: 10
     permissions:
       contents: write   # required by peaceiris/actions-gh-pages
+    env:
+      # Use the runner's pre-installed Chrome instead of Puppeteer's bundled
+      # Chromium — skips the download and speeds up npm install.
+      PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
+      PUPPETEER_EXECUTABLE_PATH: /usr/bin/google-chrome-stable
 
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
 
-      - name: Generate ontology serializations
-        run: |
-          pip install uv
-          uv sync
-          uv run python src/scripts/serialise.py
-
-      - name: Copy source files to dist
-        run: |
-          mkdir -p dist/tables dist/examples dist/figures dist/js dist/shaclShapes
-
-          # Ontology source
-          cp src/mobilitydcat-ap.rdf    dist/ 2>/dev/null || true
-          cp src/mobilitydcat-ap.ttl    dist/ 2>/dev/null || true
-          cp src/mobilitydcat-ap.jsonld dist/ 2>/dev/null || true
-
-          # Example source files
-          cp src/examples/*.rdf     dist/examples/ 2>/dev/null || true
-          cp src/examples/*.ttl     dist/examples/ 2>/dev/null || true
-          cp src/examples/*.jsonld  dist/examples/ 2>/dev/null || true
-          cp src/examples/*.xml     dist/examples/ 2>/dev/null || true
-
-          # Static assets
-          cp -r src/figures/.    dist/figures/    2>/dev/null || true
-          cp -r src/shaclShapes/. dist/shaclShapes/ 2>/dev/null || true
-
-      - name: Install respec globally
-        # spec-prod installs respec locally via pnpm but the shell it spawns
-        # to run the build cannot find it. A global install makes it available
-        # system-wide regardless of what pnpm does with PATH.
-        run: npm install -g respec@36.0.0
-
-      - name: Build spec with ReSpec
-        uses: w3c/spec-prod@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          TOOLCHAIN: respec
-          SOURCE: src/index.html
-          DESTINATION: dist/index.html
-          VALIDATE_INPUT_MARKUP: false
-          VALIDATE_MARKUP: true
-          # Disabled until this issue is resolved (tool is not compatible with node.js 24)
-          # https://github.com/w3c/spec-prod/issues/222
-          # VALIDATE_LINKS: true
+          node-version: '24'
 
-      - name: Copy built index.html into dist
-        # spec-prod writes its output to a sibling directory (<repo>.common/dist/),
-        # not to the workspace dist/. Copy it back so peaceiris picks up a complete dist/.
-        run: cp "${GITHUB_WORKSPACE}.common/dist/index.html" dist/index.html
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v8.1.0
+
+      - name: Install dependencies
+        run: |
+          npm install
+          uv sync
+
+      - name: Add node_modules/.bin to PATH
+        run: echo "${{ github.workspace }}/node_modules/.bin" >> $GITHUB_PATH
+
+      - name: Serialise RDF
+        run: uv run python src/scripts/serialise.py
+
+      - name: Copy assets
+        run: uv run python src/scripts/copy-assets.py
+
+      - name: Build ReSpec spec
+        run: uv run python src/scripts/build-spec.py
+
+      - name: Validate HTML markup
+        uses: Cyb3r-Jak3/html5validator-action@v7.2.0
+        with:
+          root: dist/index.html
+          log_level: WARNING
 
       - name: Checkout gh-pages for pre-clean
         uses: actions/checkout@v4
