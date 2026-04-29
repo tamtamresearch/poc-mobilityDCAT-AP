@@ -18,13 +18,13 @@ All hand-authored source files live under `src/`. Generated artefacts go in `dis
 | `src/index.html` | ReSpec specification document (entry point) |
 | `src/config.js` | ReSpec configuration (version, editors, dates, bibliography) |
 | `src/shaclShapes/` | SHACL validation constraints |
-| `src/tables/` | HTML property tables included by `index.html` |
-| `src/examples/` | Worked examples (Turtle, JSON-LD, XML) |
+| `src/tables/` | HTML property tables included by `index.html` via `data-include` |
+| `src/examples/` | Worked examples (RDF/XML, Turtle, JSON-LD) |
 | `src/figures/` | UML diagrams |
 | `src/enterpriseArchitectFiles/` | Enterprise Architect model (`.qea`) |
 | `src/js/` | Custom JavaScript |
 | `src/appendices/` | Appendix content (placeholder) |
-| `src/scripts/` | Build tooling |
+| `src/scripts/` | Build scripts (Python) |
 | `dist/` | Generated artefacts — do not edit by hand |
 
 ---
@@ -32,20 +32,23 @@ All hand-authored source files live under `src/`. Generated artefacts go in `dis
 ## The builder
 
 **Run from repo root:**
-```bash
-bash src/scripts/run-all.sh
+```sh
+mise run build
 ```
 
 | Script | Purpose |
 |--------|---------|
-| `run-all.sh` | Top-level entry point — calls `build-all.sh` + `serialise-all.sh` |
-| `build-class-tables.php` | Generates class/property HTML tables from ontology RDF |
-| `build-summary-tables.php` | Generates summary tables |
-| `build-example-index.php` | Indexes examples |
-| `serialise-vocabulary.sh` | Converts ontology to Turtle/JSON-LD via `rdfpipe` |
-| `serialise-examples.sh` | Serialises example files |
+| `src/scripts/serialise.py` | Converts `src/*.rdf` and `src/examples/*.rdf` to Turtle and JSON-LD using rdflib |
+| `src/scripts/copy-assets.py` | Copies ontology files, examples, figures, and SHACL shapes to `dist/` |
+| `src/scripts/build-spec.py` | Starts a local HTTP server and builds `dist/index.html` via `respec` |
 
-**Prerequisites:** PHP CLI, `rdfpipe` (`pip install rdflib`), `pyshacl` (optional, for validation).
+**Why a local HTTP server?** ReSpec uses a headless Chromium browser internally. Chromium blocks `file://` fetches needed by `data-include`, so the build script serves the repo over HTTP on a random local port.
+
+**Prerequisites:** [mise](https://mise.jdx.dev/) — see `DEVELOPMENT.md` for full setup instructions.
+
+**Tool versions:**
+- Node.js 24, respec 36.0.0 — managed via mise + `package.json`
+- Python 3.12, rdflib 7.6.0, pyshacl 0.31.0 — managed via mise + uv + `pyproject.toml`
 
 ---
 

@@ -6,3 +6,6 @@ dist/
 
 # Node.js
 node_modules/
+
+# Python virtual environment (managed by uv)
+.venv/

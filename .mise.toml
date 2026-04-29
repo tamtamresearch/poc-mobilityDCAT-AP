@@ -1,6 +1,6 @@
 [tools]
-node   = "24"
-python = "3.12"
+node = "24"
+uv   = "latest"
 
 # Makes node_modules/.bin available without a global install
 [env]
@@ -9,21 +9,21 @@ _.path = ["{{cwd}}/node_modules/.bin"]
 # ── Tasks ────────────────────────────────────────────────────────────────────
 
 [tasks.install]
-description = "Install all project dependencies (npm + pip)"
+description = "Install all project dependencies (npm + uv sync)"
 run = [
   "npm install",
-  "python -m pip install -r requirements.txt",
+  "uv sync",
 ]
 
 [tasks.serialise]
-description = "Serialise RDF vocabulary and examples → Turtle + JSON-LD"
-run = "python src/scripts/serialise.py"
+description = "Serialise RDF vocabulary and examples -> Turtle + JSON-LD"
+run = "uv run python src/scripts/serialise.py"
 
 [tasks.build-spec]
-description = "Copy assets and build ReSpec HTML spec → dist/index.html"
+description = "Copy assets and build ReSpec HTML spec -> dist/index.html"
 run = [
-  "python src/scripts/copy-assets.py",
-  "python src/scripts/build-spec.py",
+  "uv run python src/scripts/copy-assets.py",
+  "uv run python src/scripts/build-spec.py",
 ]
 
 [tasks.build]

@@ -23,8 +23,9 @@ jobs:
 
       - name: Generate ontology serializations
         run: |
-          pip install rdflib==7.6.0
-          python src/scripts/serialise.py
+          pip install uv
+          uv sync
+          uv run python src/scripts/serialise.py
 
       - name: Copy source files to dist
         run: |
