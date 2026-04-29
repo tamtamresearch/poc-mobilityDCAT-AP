@@ -24,8 +24,9 @@ def main() -> None:
 
     copy_glob("mobilitydcat-ap.rdf", DIST)
 
-    for ext in ["rdf", "xml"]:
-        copy_glob(f"examples/*.{ext}", DIST / "examples")
+    for f in (SRC / "examples").iterdir():
+        if f.is_file():
+            shutil.copy2(f, DIST / "examples" / f.name)
 
     for sub in ["figures", "shaclShapes"]:
         src_dir = SRC / sub
