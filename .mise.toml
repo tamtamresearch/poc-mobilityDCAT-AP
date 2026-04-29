@@ -36,10 +36,17 @@ run = [
 description = "Full build: clean dist/, serialise RDF, build ReSpec spec"
 depends = ["serialise", "build-spec"]
 
+[tasks.validate]
+description = "Validate dist/index.html markup with html-validate"
+run = "html-validate dist/index.html"
+
 [tasks.lint]
-description = "Build spec and list all broken local references"
+description = "Build spec, validate markup, and list all broken local references"
 depends = ["build"]
-run = "uv run python src/scripts/check-refs.py"
+run = [
+  "html-validate dist/index.html",
+  "uv run python src/scripts/check-refs.py",
+]
 
 [tasks.serve]
 description = "Serve repo over HTTP for live ReSpec preview with interactive warnings"

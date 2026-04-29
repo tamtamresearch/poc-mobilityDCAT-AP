@@ -46,10 +46,15 @@ mise run build-spec   # copy assets to dist/ and build dist/index.html via ReSpe
 ## Linting
 
 ```sh
-mise run lint         # full build + prints every broken local reference
+mise run lint         # full build + HTML validation + broken local references
+mise run validate     # HTML markup validation only (requires a prior build)
 ```
 
-ReSpec only reports the count of broken references in its CLI output. `mise run lint` runs the full build and then parses `dist/index.html` with `src/scripts/check-refs.py`, which cross-references all `id` attributes against all `href="#..."` links and prints each broken one.
+`mise run lint` runs the full build, then:
+1. Validates `dist/index.html` markup with `html-validate` (rules defined in `.htmlvalidate.json`)
+2. Parses `dist/index.html` with `src/scripts/check-refs.py`, which cross-references all `id` attributes against all `href="#..."` links and prints each broken one
+
+ReSpec only reports a count of broken references in its CLI output — `check-refs.py` gives the actual list.
 
 ## Live preview
 
