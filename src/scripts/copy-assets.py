@@ -1,0 +1,40 @@
+#!/usr/bin/env python3
+"""Copy source assets to dist/ before the ReSpec build.
+
+Run from repo root: python src/scripts/copy-assets.py
+"""
+
+import shutil
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+SRC = REPO_ROOT / "src"
+DIST = REPO_ROOT / "dist"
+
+
+def copy_glob(pattern: str, dest: Path) -> None:
+    dest.mkdir(parents=True, exist_ok=True)
+    for f in SRC.glob(pattern):
+        shutil.copy2(f, dest / f.name)
+
+
+def main() -> None:
+    for sub in ["examples", "figures", "shaclShapes"]:
+        (DIST / sub).mkdir(parents=True, exist_ok=True)
+
+    for ext in ["rdf", "ttl", "jsonld"]:
+        copy_glob(f"mobilitydcat-ap.{ext}", DIST)
+
+    for ext in ["rdf", "ttl", "jsonld", "xml"]:
+        copy_glob(f"examples/*.{ext}", DIST / "examples")
+
+    for sub in ["figures", "shaclShapes"]:
+        src_dir = SRC / sub
+        if src_dir.exists():
+            shutil.copytree(src_dir, DIST / sub, dirs_exist_ok=True)
+
+    print("Assets copied to dist/")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,7 @@
+{
+  "name": "mobilitydcat-ap",
+  "private": true,
+  "devDependencies": {
+    "respec": "36.0.0"
+  }
+}
