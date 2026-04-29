@@ -1,52 +1,28 @@
 #!/usr/bin/env python3
 """Build ReSpec spec to dist/index.html.
 
-Serves the repo via a temporary HTTP server so respec's headless browser
-can resolve data-include paths (file:// protocol is blocked by Chromium).
-Run from repo root: python src/scripts/build-spec.py
+Uses respec's built-in --localhost server so data-include paths resolve
+correctly.
+Run from repo root: python src/scripts/build-spec.py [--verbose]
 """
 
-import functools
-import http.server
-import socket
 import subprocess
 import sys
-import threading
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-
-
-def _free_port() -> int:
-    with socket.socket() as s:
-        s.bind(("", 0))
-        return s.getsockname()[1]
+SRC = Path("src/index.html")    # relative — required by respec --localhost
+OUT = Path("dist/index.html")   # relative — required by respec --localhost
 
 
 def main() -> None:
-    port = _free_port()
-    handler = functools.partial(
-        http.server.SimpleHTTPRequestHandler,
-        directory=str(REPO_ROOT),
-    )
-    server = http.server.HTTPServer(("localhost", port), handler)
+    (REPO_ROOT / OUT).parent.mkdir(parents=True, exist_ok=True)
 
-    thread = threading.Thread(target=server.serve_forever, daemon=True)
-    thread.start()
-    print(f"Serving repo on http://localhost:{port}")
+    cmd = ["respec", "--localhost", "-s", str(SRC), "-o", str(OUT)]
+    if "--verbose" in sys.argv:
+        cmd.append("--verbose")
 
-    (REPO_ROOT / "dist").mkdir(exist_ok=True)
-
-    result = subprocess.run(
-        [
-            "respec",
-            "--src", f"http://localhost:{port}/src/index.html",
-            "--out", str(REPO_ROOT / "dist" / "index.html"),
-        ],
-        shell=(sys.platform == "win32"),
-    )
-
-    server.shutdown()
+    result = subprocess.run(cmd, cwd=REPO_ROOT, shell=(sys.platform == "win32"))
     sys.exit(result.returncode)
 
 

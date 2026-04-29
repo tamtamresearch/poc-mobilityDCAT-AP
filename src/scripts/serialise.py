@@ -42,7 +42,7 @@ def main() -> None:
     for f in sorted((REPO_ROOT / "src" / "examples").glob("*.rdf")):
         serialise(f, dist / "examples")
 
-    print("\nDone.")
+    print("\nSerialise Done.")
 
 
 if __name__ == "__main__":

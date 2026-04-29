@@ -43,15 +43,33 @@ mise run serialise    # convert src/*.rdf and src/examples/*.rdf -> dist/*.ttl +
 mise run build-spec   # copy assets to dist/ and build dist/index.html via ReSpec
 ```
 
+## Linting
+
+```sh
+mise run lint         # full build + prints every broken local reference
+```
+
+ReSpec only reports the count of broken references in its CLI output. `mise run lint` runs the full build and then parses `dist/index.html` with `src/scripts/check-refs.py`, which cross-references all `id` attributes against all `href="#..."` links and prints each broken one.
+
+## Live preview
+
+To use ReSpec's interactive warnings panel in the browser:
+
+```sh
+mise run serve        # starts HTTP server on http://localhost:8080
+```
+
+Open `http://localhost:8080/src/index.html` in a browser. ReSpec runs live and shows a warnings badge at the top — click it to see all issues with locations. Stop with `Ctrl+C`.
+
 ## How it works
 
 | Step | Script | What it does |
 |------|--------|-------------|
-| Serialise | `src/scripts/serialise.py` | Parses each `.rdf` with rdflib, writes sibling `.ttl` and `.jsonld` |
-| Copy assets | `src/scripts/copy-assets.py` | Copies ontology files, examples, figures, and SHACL shapes to `dist/` |
-| Build spec | `src/scripts/build-spec.py` | Starts a local HTTP server, runs `respec` against it, writes `dist/index.html` |
+| Serialise | `src/scripts/serialise.py` | Parses each `.rdf` with rdflib, writes `.ttl` and `.jsonld` to `dist/` |
+| Copy assets | `src/scripts/copy-assets.py` | Copies ontology source, examples, figures, and SHACL shapes to `dist/` |
+| Build spec | `src/scripts/build-spec.py` | Calls `respec --localhost`, which spins up its own HTTP server, builds `dist/index.html`, and shuts down |
 
-A local HTTP server is used for the ReSpec build because Chromium (used internally by ReSpec) blocks `file://` requests required by `data-include`.
+`--localhost` is required because Chromium (used internally by ReSpec) blocks `file://` requests needed by `data-include`. All paths (`src/index.html` → `dist/index.html`) are defined in `build-spec.py`.
 
 ## Source layout
 
