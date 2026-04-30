@@ -25,27 +25,20 @@ jobs:
           name: ${{ inputs.artifact_name }}
           path: dist
 
-      - name: Checkout gh-pages for pre-clean
+      - name: Checkout gh-pages
         uses: actions/checkout@v6
         with:
           ref: gh-pages
           path: gh-pages-out
 
-      - name: Clear ${{ inputs.destination_dir }} on gh-pages
+      - name: Publish ${{ inputs.destination_dir }}
         working-directory: gh-pages-out
         run: |
           git config user.name  "github-actions"
           git config user.email "github-actions@github.com"
           rm -rf "${{ inputs.destination_dir }}"
+          mkdir -p "${{ inputs.destination_dir }}"
+          cp -r ../dist/. "${{ inputs.destination_dir }}/"
           git add -A
-          git commit -m "chore: clear ${{ inputs.destination_dir }} before rebuild" || echo "Nothing to clear"
+          git commit -m "chore: publish ${{ inputs.destination_dir }}" || echo "Nothing to publish"
           git push
-
-      - name: Deploy to gh-pages — ${{ inputs.destination_dir }}
-        uses: JamesIves/github-pages-deploy-action@v4.8.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: gh-pages
-          folder: dist
-          target-folder: ${{ inputs.destination_dir }}
-          clean: false   # other dirs on gh-pages are managed by separate deploys
