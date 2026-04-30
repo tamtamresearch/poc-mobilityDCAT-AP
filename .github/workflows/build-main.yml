@@ -6,8 +6,10 @@ name: Build and publish — main (drafts/latest)
 on:
   push:
     branches: [main]
-    paths:                     # only run when these change
-      - 'src/**'
+    paths:                      # only run when these change
+      - 'src/**'                # source files
+      - 'package.json'          # Node (npm) packages
+      - 'pyproject.toml'        # Python packages
   workflow_dispatch:
 
 jobs:
