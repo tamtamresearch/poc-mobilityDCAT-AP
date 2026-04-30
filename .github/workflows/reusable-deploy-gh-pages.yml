@@ -42,9 +42,10 @@ jobs:
           git push
 
       - name: Deploy to gh-pages — ${{ inputs.destination_dir }}
-        uses: peaceiris/actions-gh-pages@v4
+        uses: JamesIves/github-pages-deploy-action@v4.8.0
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: dist
-          destination_dir: ${{ inputs.destination_dir }}
-          keep_files: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: gh-pages
+          folder: dist
+          target-folder: ${{ inputs.destination_dir }}
+          clean: false   # other dirs on gh-pages are managed by separate deploys
