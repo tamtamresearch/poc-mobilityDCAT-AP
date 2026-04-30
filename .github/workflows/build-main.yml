@@ -62,6 +62,10 @@ jobs:
         run: html-validate dist/index.html
         continue-on-error: true
 
+      - name: Checking references in HTML
+        run: uv run python src/scripts/check-refs.py
+        continue-on-error: true
+
       - name: Checkout gh-pages for pre-clean
         uses: actions/checkout@v4
         with:
