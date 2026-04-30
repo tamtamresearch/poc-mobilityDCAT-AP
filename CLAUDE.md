@@ -63,7 +63,7 @@ The build and deploy logic is split into two **reusable workflows** called by th
 | File | Type | Purpose |
 |------|------|---------|
 | `reusable-build.yml` | reusable | Full build pipeline (serialise → copy-assets → build-spec → html-validate → check-refs); uploads `dist/` as artifact `spec-dist` |
-| `reusable-deploy-gh-pages.yml` | reusable | Downloads `dist/` artifact, pre-cleans the target directory on `gh-pages`, deploys via plain `git` |
+| `reusable-publish-gh-pages.yml` | reusable | Downloads `dist/` artifact, pre-cleans the target directory on `gh-pages`, deploys via plain `git` |
 | `build-main.yml` | caller | Triggered on push to `main` (path-filtered to `src/**`, `package.json`, `pyproject.toml`) or manually; publishes to `drafts/latest/` |
 | `build-draft.yml` | caller | Triggered on push of a `draft/*` tag or manually; publishes to `drafts/<version>/` |
 | `build-release.yml` | caller | Triggered on push to a `release/*` branch or manually; publishes to `releases/<version>/`; also publishes to `releases/latest/` if `LATEST_RELEASE` matches the branch version |
@@ -71,9 +71,9 @@ The build and deploy logic is split into two **reusable workflows** called by th
 
 **Version extraction** — `build-draft.yml` and `build-release.yml` strip the prefix from `GITHUB_REF_NAME` (`draft/` or `release/`) in a dedicated `extract-version` job. A fail-fast guard rejects the run early if the result does not look like a version number (e.g. when `workflow_dispatch` is triggered from a plain branch).
 
-**Latest release marker** — `LATEST_RELEASE` in the repo root (on `main`) holds the version currently marked as latest. `build-release.yml` sparse-checks out this file from `main` and compares it to the current branch version; an `is_latest` output gates a second `deploy-latest` job. `promote-latest.yml` does two things: updates `LATEST_RELEASE` on `main` (so future hotfixes to the promoted branch auto-update `releases/latest/`), then copies the already-built `releases/<version>/` to `releases/latest/` on `gh-pages` immediately. Release branches never carry this file.
+**Latest release marker** — `LATEST_RELEASE` in the repo root (on `main`) holds the version currently marked as latest. `build-release.yml` sparse-checks out this file from `main` and compares it to the current branch version; an `is_latest` output gates a second `publish-latest` job. `promote-latest.yml` does two things: updates `LATEST_RELEASE` on `main` (so future hotfixes to the promoted branch auto-update `releases/latest/`), then copies the already-built `releases/<version>/` to `releases/latest/` on `gh-pages` immediately. Release branches never carry this file.
 
-**Artifact flow** — `reusable-build.yml` outputs `artifact_name` (default: `spec-dist`). Callers pass `needs.build.outputs.artifact_name` to `reusable-deploy-gh-pages.yml`, so the artifact name is defined in one place.
+**Artifact flow** — `reusable-build.yml` outputs `artifact_name` (default: `spec-dist`). Callers pass `needs.build.outputs.artifact_name` to `reusable-publish-gh-pages.yml`, so the artifact name is defined in one place.
 
 ---
 

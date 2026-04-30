@@ -9,7 +9,7 @@ on:
         default: 'spec-dist'
     outputs:
       artifact_name:
-        description: 'Name of the uploaded dist artifact (pass to reusable-deploy-gh-pages)'
+        description: 'Name of the uploaded dist artifact (pass to reusable-publish-gh-pages)'
         value: ${{ jobs.build.outputs.artifact_name }}
 
 jobs:

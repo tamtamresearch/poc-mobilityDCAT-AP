@@ -60,21 +60,21 @@ jobs:
     needs: extract-version
     uses: ./.github/workflows/reusable-build.yml
 
-  deploy:
+  publish:
     needs: [extract-version, build]
     permissions:
       contents: write
-    uses: ./.github/workflows/reusable-deploy-gh-pages.yml
+    uses: ./.github/workflows/reusable-publish-gh-pages.yml
     with:
       artifact_name: ${{ needs.build.outputs.artifact_name }}
       destination_dir: releases/${{ needs.extract-version.outputs.version }}
 
-  deploy-latest:
+  publish-latest:
     needs: [extract-version, build]
     if: needs.extract-version.outputs.is_latest == 'true'
     permissions:
       contents: write
-    uses: ./.github/workflows/reusable-deploy-gh-pages.yml
+    uses: ./.github/workflows/reusable-publish-gh-pages.yml
     with:
       artifact_name: ${{ needs.build.outputs.artifact_name }}
       destination_dir: releases/latest

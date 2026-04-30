@@ -35,11 +35,11 @@ jobs:
     needs: extract-version
     uses: ./.github/workflows/reusable-build.yml
 
-  deploy:
+  publish:
     needs: [extract-version, build]
     permissions:
       contents: write
-    uses: ./.github/workflows/reusable-deploy-gh-pages.yml
+    uses: ./.github/workflows/reusable-publish-gh-pages.yml
     with:
       artifact_name: ${{ needs.build.outputs.artifact_name }}
       destination_dir: drafts/${{ needs.extract-version.outputs.version }}

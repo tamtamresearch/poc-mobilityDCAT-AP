@@ -50,7 +50,7 @@ The build and deploy steps are split into two reusable workflows called by the a
 | Reusable workflow | Purpose |
 |-------------------|---------|
 | `reusable-build.yml` | Full build pipeline - serialise RDF, copy assets, build ReSpec spec, validate HTML, check references; uploads `dist/` as an artifact |
-| `reusable-deploy-gh-pages.yml` | Pre-clean target directory on `gh-pages`, then deploy the artifact via plain `git` |
+| `reusable-publish-gh-pages.yml` | Pre-clean target directory on `gh-pages`, then deploy the artifact via plain `git` |
 
 ### Promoting a release to `releases/latest/`
 
