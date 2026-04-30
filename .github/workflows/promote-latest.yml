@@ -1,7 +1,11 @@
 name: Promote release to releases/latest
 
-# Manually promote a previously published releases/X.Y.Z/ to releases/latest/.
-# Run this explicitly after verifying a release — never runs automatically.
+# Promotes a previously published release to releases/latest/.
+# Does two things:
+#   1. Updates LATEST_RELEASE on main — so future hotfixes to this release
+#      branch will automatically update releases/latest/.
+#   2. Copies the already-built releases/X.Y.Z/ to releases/latest/ on gh-pages
+#      immediately, without waiting for a re-build.
 #
 # Usage: Actions → "Promote release to releases/latest" → Run workflow → enter version (e.g. 1.0.0)
 
@@ -20,12 +24,28 @@ jobs:
       contents: write
 
     steps:
+      - name: Update LATEST_RELEASE on main
+        uses: actions/checkout@v6
+        with:
+          ref: main
+
+      - name: Write version and push to main
+        run: |
+          git config user.name  "github-actions"
+          git config user.email "github-actions@github.com"
+          echo "${{ inputs.version }}" > LATEST_RELEASE
+          git add LATEST_RELEASE
+          git commit -m "chore: mark ${{ inputs.version }} as latest release"
+          git push
+
       - name: Checkout gh-pages
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: gh-pages
+          path: gh-pages-out
 
-      - name: Promote releases/${{ inputs.version }} to releases/latest
+      - name: Copy releases/${{ inputs.version }} to releases/latest
+        working-directory: gh-pages-out
         run: |
           git config user.name  "github-actions"
           git config user.email "github-actions@github.com"
@@ -36,8 +56,7 @@ jobs:
           fi
 
           rm -rf releases/latest
-          cp -r releases/${{ inputs.version }}/. releases/latest/
-
+          cp -r "releases/${{ inputs.version }}/." releases/latest/
           git add -A
           git commit -m "chore: promote releases/${{ inputs.version }} to releases/latest"
           git push

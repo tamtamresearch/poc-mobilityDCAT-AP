@@ -6,8 +6,14 @@ name: Build and publish — release/* (releases/vX.Y.Z)
 # Publishes to gh-pages under:
 #   releases/1.0.0/   — the versioned copy
 #
-# releases/latest/ is NOT updated automatically. Use promote-latest.yml
-# (workflow_dispatch) to explicitly promote a version to latest.
+# If LATEST_RELEASE on main contains the same version as this branch,
+# also publishes to releases/latest/ automatically.
+#
+# This means hotfixes to the current latest release branch update
+# releases/latest/ automatically, just like any other push to that branch.
+# Hotfixes to older release branches only update their versioned directory.
+#
+# To promote a version to latest, run promote-latest.yml (workflow_dispatch).
 
 on:
   push:
@@ -19,6 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.extract.outputs.version }}
+      is_latest: ${{ steps.check_latest.outputs.is_latest }}
     steps:
       - name: Extract and validate version from branch name
         id: extract
@@ -30,6 +37,24 @@ jobs:
             exit 1
           fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Checkout LATEST_RELEASE from main
+        uses: actions/checkout@v6
+        with:
+          ref: main
+          sparse-checkout: |
+            LATEST_RELEASE
+          sparse-checkout-cone-mode: false
+
+      - name: Check if this is the latest release
+        id: check_latest
+        run: |
+          LATEST=$(grep -v '^#' LATEST_RELEASE | tr -d '[:space:]')
+          if [ "$LATEST" = "${{ steps.extract.outputs.version }}" ]; then
+            echo "is_latest=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_latest=false" >> $GITHUB_OUTPUT
+          fi
 
   build:
     needs: extract-version
@@ -43,3 +68,13 @@ jobs:
     with:
       artifact_name: ${{ needs.build.outputs.artifact_name }}
       destination_dir: releases/${{ needs.extract-version.outputs.version }}
+
+  deploy-latest:
+    needs: [extract-version, build]
+    if: needs.extract-version.outputs.is_latest == 'true'
+    permissions:
+      contents: write
+    uses: ./.github/workflows/reusable-deploy-gh-pages.yml
+    with:
+      artifact_name: ${{ needs.build.outputs.artifact_name }}
+      destination_dir: releases/latest
