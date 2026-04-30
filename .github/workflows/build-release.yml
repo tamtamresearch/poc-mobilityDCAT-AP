@@ -8,8 +8,6 @@ name: Build and publish — release/* (releases/vX.Y.Z)
 #
 # releases/latest/ is NOT updated automatically. Use promote-latest.yml
 # (workflow_dispatch) to explicitly promote a version to latest.
-#
-# Also creates a GitHub Release with the built docs as a zip artefact.
 
 on:
   push:
@@ -17,83 +15,31 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-publish:
+  extract-version:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write   # required by peaceiris/actions-gh-pages and softprops/action-gh-release
-
+    outputs:
+      version: ${{ steps.extract.outputs.version }}
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v4
-
-      - name: Extract version from branch name
-        # release/1.0.0 → VERSION=1.0.0
-        run: echo "VERSION=${GITHUB_REF_NAME#release/}" >> $GITHUB_ENV
-
-      - name: Generate ontology serializations
+      - name: Extract and validate version from branch name
+        id: extract
         run: |
-          pip install rdflib
-          (cd src/scripts && bash serialise-vocabulary.sh)
+          VERSION="${GITHUB_REF_NAME#release/}"
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+ ]]; then
+            echo "ERROR: '$VERSION' is not a valid version number."
+            echo "This workflow must be triggered from a release/* branch, not from another branch."
+            exit 1
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-      - name: Copy source files to dist
-        run: |
-          mkdir -p dist/tables dist/examples dist/figures dist/js dist/shaclShapes
+  build:
+    needs: extract-version
+    uses: ./.github/workflows/reusable-build.yml
 
-          cp src/config.js  dist/
-
-          cp src/mobilitydcat-ap.rdf    dist/ 2>/dev/null || true
-          cp src/mobilitydcat-ap.ttl    dist/ 2>/dev/null || true
-          cp src/mobilitydcat-ap.jsonld dist/ 2>/dev/null || true
-
-          cp src/tables/*.html dist/tables/ 2>/dev/null || true
-
-          cp src/examples/*.rdf dist/examples/ 2>/dev/null || true
-          cp src/examples/*.ttl dist/examples/ 2>/dev/null || true
-
-          cp -r src/figures/.    dist/figures/    2>/dev/null || true
-          cp -r src/js/.         dist/js/         2>/dev/null || true
-          cp -r src/shaclShapes/. dist/shaclShapes/ 2>/dev/null || true
-
-      - name: Build spec with ReSpec
-        uses: w3c/spec-prod@v2
-        with:
-          TOOLCHAIN: respec
-          SOURCE: src/index.html
-          DESTINATION: dist/index.html
-
-      - name: Copy built index.html into dist
-        run: cp "${GITHUB_WORKSPACE}.common/dist/index.html" dist/index.html
-
-      - name: Checkout gh-pages for pre-clean
-        uses: actions/checkout@v4
-        with:
-          ref: gh-pages
-          path: gh-pages-out
-
-      - name: Clear releases/${{ env.VERSION }} on gh-pages
-        working-directory: gh-pages-out
-        run: |
-          git config user.name  "github-actions"
-          git config user.email "github-actions@github.com"
-          rm -rf releases/${{ env.VERSION }}
-          git add -A
-          git commit -m "chore: clear releases/${{ env.VERSION }} before rebuild" || echo "Nothing to clear"
-          git push
-
-      - name: Deploy to gh-pages — releases/${{ env.VERSION }}
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: dist
-          destination_dir: releases/${{ env.VERSION }}
-          keep_files: true
-
-      - name: Package built docs
-        run: zip -r docs-${{ env.VERSION }}.zip dist/
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v${{ env.VERSION }}
-          name: mobilityDCAT-AP ${{ env.VERSION }}
-          files: docs-${{ env.VERSION }}.zip
+  deploy:
+    needs: [extract-version, build]
+    permissions:
+      contents: write
+    uses: ./.github/workflows/reusable-deploy-gh-pages.yml
+    with:
+      artifact_name: ${{ needs.build.outputs.artifact_name }}
+      destination_dir: releases/${{ needs.extract-version.outputs.version }}

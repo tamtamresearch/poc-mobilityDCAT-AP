@@ -53,6 +53,27 @@ mise run build
 
 ---
 
+## CI/CD workflows
+
+All workflows live in `.github/workflows/` and publish to the `gh-pages` branch.
+
+The build and deploy logic is split into two **reusable workflows** called by the three publishing workflows:
+
+| File | Type | Purpose |
+|------|------|---------|
+| `reusable-build.yml` | reusable | Full build pipeline (serialise → copy-assets → build-spec → html-validate → check-refs); uploads `dist/` as artifact `spec-dist` |
+| `reusable-deploy-gh-pages.yml` | reusable | Downloads `dist/` artifact, pre-cleans the target directory on `gh-pages`, deploys via `peaceiris/actions-gh-pages` |
+| `build-main.yml` | caller | Triggered on push to `main` (path-filtered to `src/**`, `package.json`, `pyproject.toml`) or manually; publishes to `drafts/latest/` |
+| `build-draft.yml` | caller | Triggered on push of a `draft/*` tag or manually; publishes to `drafts/<version>/` |
+| `build-release.yml` | caller | Triggered on push to a `release/*` branch or manually; publishes to `releases/<version>/` |
+| `promote-latest.yml` | standalone | Manual only; copies an existing `releases/<version>/` to `releases/latest/` on `gh-pages` |
+
+**Version extraction** — `build-draft.yml` and `build-release.yml` strip the prefix from `GITHUB_REF_NAME` (`draft/` or `release/`) in a dedicated `extract-version` job. A fail-fast guard rejects the run early if the result does not look like a version number (e.g. when `workflow_dispatch` is triggered from a plain branch).
+
+**Artifact flow** — `reusable-build.yml` outputs `artifact_name` (default: `spec-dist`). Callers pass `needs.build.outputs.artifact_name` to `reusable-deploy-gh-pages.yml`, so the artifact name is defined in one place.
+
+---
+
 ## Key external links
 
 - Published spec: https://w3id.org/mobilitydcat-ap/releases/

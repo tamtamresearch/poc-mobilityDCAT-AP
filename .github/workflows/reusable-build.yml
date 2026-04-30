@@ -1,0 +1,71 @@
+name: Reusable — build spec
+
+on:
+  workflow_call:
+    inputs:
+      artifact_name:
+        description: 'Name for the uploaded dist artifact'
+        type: string
+        default: 'spec-dist'
+    outputs:
+      artifact_name:
+        description: 'Name of the uploaded dist artifact (pass to reusable-deploy-gh-pages)'
+        value: ${{ jobs.build.outputs.artifact_name }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      artifact_name: ${{ inputs.artifact_name }}
+    env:
+      PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
+      PUPPETEER_EXECUTABLE_PATH: /usr/bin/google-chrome-stable
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v8.1.0
+
+      - name: Install dependencies
+        run: |
+          npm install
+          uv sync
+
+      - name: Add node_modules/.bin to PATH
+        run: echo "${{ github.workspace }}/node_modules/.bin" >> $GITHUB_PATH
+
+      - name: Serialise RDF
+        run: uv run python src/scripts/serialise.py
+
+      - name: Copy assets
+        run: uv run python src/scripts/copy-assets.py
+
+      - name: Build ReSpec spec
+        run: uv run python src/scripts/build-spec.py
+
+      - name: Validate HTML markup
+        run: html-validate dist/index.html
+        continue-on-error: true
+
+      - name: Check references in HTML
+        run: uv run python src/scripts/check-refs.py
+        continue-on-error: true
+
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact_name }}
+          path: dist/

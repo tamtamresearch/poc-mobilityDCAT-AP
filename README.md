@@ -21,7 +21,7 @@ src/
 ├── shaclShapes/               # SHACL validation constraints
 ├── validationFiles/           # Granular SHACL shapes (one per class)
 ├── js/                        # Custom JavaScript
-├── scripts/                   # Build tooling (run-all.sh is the entry point)
+├── scripts/                   # Build scripts (Python); see DEVELOPMENT.md
 ├── enterpriseArchitectFiles/  # EA model (.qea)
 └── appendices/                # Appendix content (placeholder)
 ```
@@ -38,19 +38,26 @@ src/
 
 Workflows live in `.github/workflows/` and publish to the `gh-pages` branch.
 
-| Workflow | Trigger | Publishes to | GitHub Release |
-|----------|---------|-------------|----------------|
-| `build-main.yml` | push to `main`, manual | `drafts/latest/` | — |
-| `build-release.yml` | push to `release/*`, manual | `releases/X.Y.Z/` | full release |
-| `build-draft.yml` | push of `draft/*` tag, manual | `drafts/X.Y.Z-draft-A.B/` | pre-release |
-| `promote-latest.yml` | manual only | `releases/latest/` ← copy of chosen version | — |
+| Workflow | Trigger | Publishes to |
+|----------|---------|-------------|
+| `build-main.yml` | push to `main` (src changes), manual | `drafts/latest/` |
+| `build-release.yml` | push to `release/*`, manual | `releases/X.Y.Z/` |
+| `build-draft.yml` | push of `draft/*` tag, manual | `drafts/X.Y.Z-draft-A.B/` |
+| `promote-latest.yml` | manual only | `releases/latest/` ← copy of chosen version |
+
+The build and deploy steps are split into two reusable workflows called by the above:
+
+| Reusable workflow | Purpose |
+|-------------------|---------|
+| `reusable-build.yml` | Full build pipeline — serialise RDF, copy assets, build ReSpec spec, validate HTML, check references; uploads `dist/` as an artifact |
+| `reusable-deploy-gh-pages.yml` | Pre-clean target directory on `gh-pages`, then deploy the artifact |
 
 `releases/latest/` is **never updated automatically**. After verifying a release, run `promote-latest.yml` from the Actions tab and enter the version number (e.g. `1.0.0`). This makes promotion an explicit, deliberate step — pushing a fix to an older release branch will not silently overwrite latest.
 
 ## Building locally
 
 ```bash
-bash src/scripts/run-all.sh
+mise run build
 ```
 
-Output lands in `dist/` at the repository root.
+Output lands in `dist/` at the repository root. See `DEVELOPMENT.md` for prerequisites and setup.
