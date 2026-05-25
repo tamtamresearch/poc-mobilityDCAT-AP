@@ -70,3 +70,5 @@ To promote a different version to latest:
 ## Building locally
 
 See `DEVELOPMENT.md` for prerequisites, setup, and build instructions.
+
+Byl jsem tu: Honza
