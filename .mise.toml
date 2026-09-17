@@ -20,21 +20,22 @@ description = "Empty dist/ before a fresh build"
 run = "uv run python src/scripts/clean.py"
 
 [tasks.serialise]
-description = "Serialise RDF vocabulary and examples -> Turtle + JSON-LD"
+description = "Serialise Turtle vocabulary and examples -> RDF/XML + JSON-LD"
 depends = ["clean"]
 run = "uv run python src/scripts/serialise.py"
 
+# Depends on serialise so dist/ is always filled in the same order
 [tasks.build-spec]
 description = "Copy assets and build ReSpec HTML spec -> dist/index.html"
-depends = ["clean"]
+depends = ["serialise"]
 run = [
   "uv run python src/scripts/copy-assets.py",
   "uv run python src/scripts/build-spec.py",
 ]
 
 [tasks.build]
-description = "Full build: clean dist/, serialise RDF, build ReSpec spec"
-depends = ["serialise", "build-spec"]
+description = "Full build: clean dist/, serialise Turtle, build ReSpec spec"
+depends = ["build-spec"]
 
 [tasks.validate]
 description = "Validate dist/index.html markup with html-validate"

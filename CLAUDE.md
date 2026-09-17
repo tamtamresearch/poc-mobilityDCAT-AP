@@ -12,15 +12,16 @@ This is a **proof-of-concept repository** for a proposed new repository structur
 
 All hand-authored source files live under `src/`. Generated artefacts go in `dist/` (do not edit by hand).
 
+Turtle is the source format for the ontology and the examples. The RDF/XML and JSON-LD serialisations are produced by `serialise.py` on every build and are never committed.
+
 | Path | Purpose |
 |------|---------|
-| `src/mobilitydcat-ap.rdf` | Ontology — primary source of truth (RDF/XML) |
+| `src/mobilitydcat-ap.ttl` | Ontology — primary source of truth (Turtle) |
 | `src/index.html` | ReSpec specification document (entry point) |
 | `src/config.js` | ReSpec configuration (version, editors, dates, bibliography) |
 | `src/shaclShapes/` | SHACL validation constraints |
-| `src/validationFiles/` | Granular SHACL shapes (one per class) |
 | `src/tables/` | HTML property tables included by `index.html` via `data-include` |
-| `src/examples/` | Worked examples (RDF/XML, Turtle, JSON-LD) |
+| `src/examples/` | Worked examples (Turtle) |
 | `src/figures/` | UML diagrams |
 | `src/enterpriseArchitectFiles/` | Enterprise Architect model (`.qea`) |
 | `src/js/` | Custom JavaScript |
@@ -40,8 +41,8 @@ mise run build
 | Script | Purpose |
 |--------|---------|
 | `src/scripts/clean.py` | Empties `dist/` before a fresh build |
-| `src/scripts/serialise.py` | Converts `src/*.rdf` and `src/examples/*.rdf` to Turtle and JSON-LD using rdflib |
-| `src/scripts/copy-assets.py` | Copies ontology files, examples, figures, and SHACL shapes to `dist/` |
+| `src/scripts/serialise.py` | Converts `src/*.ttl` and `src/examples/*.ttl` to RDF/XML and JSON-LD using rdflib |
+| `src/scripts/copy-assets.py` | Copies the Turtle sources, examples, figures, and SHACL shapes to `dist/` |
 | `src/scripts/build-spec.py` | Starts a local HTTP server and builds `dist/index.html` via `respec` |
 
 **Why a local HTTP server?** ReSpec uses a headless Chromium browser internally. Chromium blocks `file://` fetches needed by `data-include`, so the build script serves the repo over HTTP on a random local port.

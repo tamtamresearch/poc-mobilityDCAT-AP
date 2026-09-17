@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """Copy source assets to dist/ before the ReSpec build.
 
+Only hand-authored files are copied. The RDF/XML and JSON-LD serialisations of
+the ontology and the examples are produced by serialise.py.
+
 Run from repo root: python src/scripts/copy-assets.py
 """
 
@@ -22,7 +25,7 @@ def main() -> None:
     for sub in ["examples", "figures", "shaclShapes"]:
         (DIST / sub).mkdir(parents=True, exist_ok=True)
 
-    copy_glob("mobilitydcat-ap.rdf", DIST)
+    copy_glob("mobilitydcat-ap.ttl", DIST)
 
     for f in (SRC / "examples").iterdir():
         if f.is_file():

@@ -30,7 +30,7 @@ mise run install      # npm install + uv sync (creates .venv with all Python dep
 ## Build
 
 ```sh
-mise run build        # full build: serialise RDF + build ReSpec spec
+mise run build        # full build: serialise Turtle + build ReSpec spec
 ```
 
 All output is written to **`dist/`**. Open `dist/index.html` in a browser to preview the built specification.
@@ -39,7 +39,7 @@ Individual steps:
 
 ```sh
 mise run clean        # empty dist/ (run automatically at the start of mise run build)
-mise run serialise    # convert src/*.rdf and src/examples/*.rdf -> dist/*.ttl + dist/*.jsonld
+mise run serialise    # convert src/*.ttl and src/examples/*.ttl -> dist/*.rdf + dist/*.jsonld
 mise run build-spec   # copy assets to dist/ and build dist/index.html via ReSpec
 ```
 
@@ -70,8 +70,8 @@ Open `http://localhost:8080/src/index.html` in a browser. ReSpec runs live and s
 
 | Step | Script | What it does |
 |------|--------|-------------|
-| Serialise | `src/scripts/serialise.py` | Parses each `.rdf` with rdflib, writes `.ttl` and `.jsonld` to `dist/` |
-| Copy assets | `src/scripts/copy-assets.py` | Copies ontology source, examples, figures, and SHACL shapes to `dist/` |
+| Serialise | `src/scripts/serialise.py` | Parses each `.ttl` with rdflib, writes `.rdf` and `.jsonld` to `dist/` |
+| Copy assets | `src/scripts/copy-assets.py` | Copies the Turtle sources, examples, figures, and SHACL shapes to `dist/` |
 | Build spec | `src/scripts/build-spec.py` | Calls `respec --localhost`, which spins up its own HTTP server, builds `dist/index.html`, and shuts down |
 
 `--localhost` is required because Chromium (used internally by ReSpec) blocks `file://` requests needed by `data-include`. All paths (`src/index.html` → `dist/index.html`) are defined in `build-spec.py`.
@@ -80,13 +80,15 @@ Open `http://localhost:8080/src/index.html` in a browser. ReSpec runs live and s
 
 All hand-authored files live under `src/`. Never edit files in `dist/` — they are generated.
 
+Turtle is the source format for the ontology and the examples. The `.rdf` and `.jsonld` serialisations are generated on every build and are never committed.
+
 | Path | Purpose |
 |------|---------|
-| `src/mobilitydcat-ap.rdf` | Ontology — primary source of truth (RDF/XML) |
+| `src/mobilitydcat-ap.ttl` | Ontology — primary source of truth (Turtle) |
 | `src/index.html` | ReSpec specification document |
 | `src/config.js` | ReSpec configuration (version, editors, dates, bibliography) |
 | `src/tables/` | HTML property tables included by `index.html` via `data-include` |
-| `src/examples/` | Worked examples (RDF/XML, Turtle, JSON-LD) |
+| `src/examples/` | Worked examples (Turtle) |
 | `src/shaclShapes/` | SHACL validation constraints |
 | `src/figures/` | UML diagrams |
 | `src/enterpriseArchitectFiles/` | Enterprise Architect model (`.qea`) |

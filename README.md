@@ -8,18 +8,19 @@
 
 All hand-authored source files live in `src/`. Generated artefacts go in `dist/` and must not be edited by hand.
 
+Turtle is the source format for the ontology and the examples. The RDF/XML and JSON-LD serialisations are produced by the build and are never committed.
+
 ## Structure
 
 ```
 src/
 ├── index.html                 # ReSpec specification document (entry point)
 ├── config.js                  # ReSpec configuration
-├── mobilitydcat-ap.rdf        # Ontology - primary source of truth (RDF/XML)
+├── mobilitydcat-ap.ttl        # Ontology - primary source of truth (Turtle)
 ├── tables/                    # HTML property tables included by index.html
-├── examples/                  # Worked examples
+├── examples/                  # Worked examples (Turtle)
 ├── figures/                   # UML diagrams and logo
 ├── shaclShapes/               # SHACL validation constraints
-├── validationFiles/           # Granular SHACL shapes (one per class)
 ├── js/                        # Custom JavaScript
 ├── scripts/                   # Build scripts (Python); see DEVELOPMENT.md
 ├── enterpriseArchitectFiles/  # EA model (.qea)
