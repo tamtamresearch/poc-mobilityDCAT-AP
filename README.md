@@ -2,7 +2,7 @@
 
 > **This is a proof of concept** demonstrating a proposed repository layout and GitHub Actions publishing workflow for mobilityDCAT-AP. It is not the authoritative specification repository.
 >
-> The goal is to validate the branch-based versioning strategy (see `PLAN.md`) before applying it to the main repo.
+> The goal is to validate the branch-based versioning strategy before applying it to the main repo.
 
 ## Source files
 
@@ -28,11 +28,11 @@ src/
 
 ## Branching convention
 
-| Ref | Type | Published to |
-|-----|------|-------------|
-| `main` | Latest draft | `drafts/latest/` |
-| `release/1.0.0` | Release branch | `releases/1.0.0/` |
-| `draft/1.0.0-draft-0.1` | Draft tag | `drafts/1.0.0-draft-0.1/` |
+| Ref | Type | Goes to folder in gh-pages |
+|-----|------|----------------------------|
+| `main` | Latest draft | `drafts/latest/`           |
+| `release/1.0.0` | Release branch | `releases/1.0.0/`          |
+| `draft/1.0.0-draft-0.1` | Draft tag | `drafts/1.0.0-draft-0.1/`  |
 
 ## GitHub Actions workflows
 
