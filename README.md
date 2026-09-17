@@ -44,6 +44,7 @@ Workflows live in `.github/workflows/` and publish to the `gh-pages` branch.
 | `build-release.yml` | push to `release/*`, manual | `releases/X.Y.Z/` and `releases/latest/` if marked |
 | `build-draft.yml` | push of `draft/*` tag, manual | `drafts/X.Y.Z-draft-A.B/` |
 | `promote-latest.yml` | manual only | updates `LATEST_RELEASE` on `main` + copies already-built `releases/X.Y.Z/` to `releases/latest/` on `gh-pages` |
+| `build-check.yml` | push to any other branch, pull request to `main` or `release/*` (src changes), manual | nothing; `dist/` is uploaded as a run artifact only |
 
 The build and deploy steps are split into two reusable workflows called by the above:
 

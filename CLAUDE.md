@@ -68,6 +68,7 @@ The build and deploy logic is split into two **reusable workflows** called by th
 | `build-draft.yml` | caller | Triggered on push of a `draft/*` tag or manually; publishes to `drafts/<version>/` |
 | `build-release.yml` | caller | Triggered on push to a `release/*` branch or manually; publishes to `releases/<version>/`; also publishes to `releases/latest/` if `LATEST_RELEASE` matches the branch version |
 | `promote-latest.yml` | standalone | Manual only; updates `LATEST_RELEASE` on `main` + copies already-built `releases/<version>/` to `releases/latest/` on `gh-pages` directly |
+| `build-check.yml` | caller | Triggered on push to any branch other than `main`/`release/*`, on pull requests to `main` or `release/*` (path-filtered like `build-main.yml`), or manually; runs `reusable-build.yml` only and publishes nothing |
 
 **Version extraction** — `build-draft.yml` and `build-release.yml` strip the prefix from `GITHUB_REF_NAME` (`draft/` or `release/`) in a dedicated `extract-version` job. A fail-fast guard rejects the run early if the result does not look like a version number (e.g. when `workflow_dispatch` is triggered from a plain branch).
 
