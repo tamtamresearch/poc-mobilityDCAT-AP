@@ -1,5 +1,10 @@
 # Development guide
 
+This guide covers the toolchain: prerequisites, setup, building and linting
+locally. For the editing and publishing procedures that use it - edit the draft,
+tag a draft snapshot, create a release, promote it, hotfix it - see
+[`PROCEDURES.md`](PROCEDURES.md).
+
 ## Prerequisites
 
 - [mise](https://mise.jdx.dev/) — manages Node.js and uv versions locally
@@ -114,4 +119,7 @@ Turtle is the source format for the ontology and the examples. The `.rdf` and `.
 
 ## CI
 
-The GitHub Actions workflow (`.github/workflows/build-main.yml`) mirrors the local build and publishes to `gh-pages` under `drafts/latest/` on every push to `main`.
+Every publishing workflow runs the same pipeline as `mise run lint`, through the
+reusable workflow `.github/workflows/reusable-build.yml`. Which ref publishes
+where is listed in `README.md`; the step-by-step procedures are in
+[`PROCEDURES.md`](PROCEDURES.md).

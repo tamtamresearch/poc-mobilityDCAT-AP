@@ -27,13 +27,42 @@ src/
 └── appendices/                # Appendix content (placeholder)
 ```
 
-## Branching convention
+## Branching and naming convention
 
-| Ref | Type | Goes to folder in gh-pages |
-|-----|------|----------------------------|
-| `main` | Latest draft | `drafts/latest/`           |
-| `release/1.0.0` | Release branch | `releases/1.0.0/`          |
-| `draft/1.0.0-draft-0.1` | Draft tag | `drafts/1.0.0-draft-0.1/`  |
+| Ref | Kind | Goes to folder in gh-pages | Example |
+|-----|------|----------------------------|---------|
+| `main` | branch | `drafts/latest/` | - |
+| `draft/X.Y.Z-draft.N[.C]` | tag | `drafts/X.Y.Z-draft.N[.C]/` | `draft/3.0.0-draft.1`, `draft/3.0.0-draft.1.1` |
+| `release/X.Y.Z` | branch | `releases/X.Y.Z/` | `release/3.0.0` |
+
+The rule in one sentence: a draft snapshot is tagged `draft/X.Y.Z-draft.N`, where
+`X.Y.Z` is the version the draft is working towards and `N` is the review round
+counting from 1, and a release is a `release/X.Y.Z` branch with no suffix.
+
+`N` may carry an optional second number, `draft.N.C`, for a correction published
+within the same review round - a typo found right after the snapshot went out,
+where opening a new review round would misrepresent what happened. Use it
+sparingly; the plain `draft.N` is the normal form.
+
+`X.Y.Z-draft.N` is a valid SemVer pre-release, so version ordering follows from
+the SemVer rules rather than from a local convention. Pre-release identifiers are
+compared left to right, `draft` equals `draft`, and the numeric ones compare
+numerically instead of as text. A longer set of identifiers sorts above a shorter
+one when everything before it is equal, which is what places a correction after
+the snapshot it corrects:
+
+```
+3.0.0-draft.1  <  3.0.0-draft.1.1  <  3.0.0-draft.2  <  3.0.0-draft.10  <  3.0.0
+```
+
+The convention also matches how DCAT-AP labels its own drafts by target version.
+
+Both patterns are enforced in CI: `build-draft.yml` rejects a tag that does not
+match `^[0-9]+\.[0-9]+\.[0-9]+(-draft\.[0-9]+(\.[0-9]+)?)?$` and
+`build-release.yml` rejects a branch that does not match
+`^[0-9]+\.[0-9]+\.[0-9]+$`.
+
+Step-by-step procedures that use these refs are in [`PROCEDURES.md`](PROCEDURES.md).
 
 ## GitHub Actions workflows
 
@@ -43,7 +72,7 @@ Workflows live in `.github/workflows/` and publish to the `gh-pages` branch.
 |----------|---------|-------------|
 | `build-main.yml` | push to `main` (src changes), manual | `drafts/latest/` |
 | `build-release.yml` | push to `release/*`, manual | `releases/X.Y.Z/` and `releases/latest/` if marked |
-| `build-draft.yml` | push of `draft/*` tag, manual | `drafts/X.Y.Z-draft-A.B/` |
+| `build-draft.yml` | push of `draft/*` tag, manual | `drafts/X.Y.Z-draft.N[.C]/` |
 | `promote-latest.yml` | manual only | updates `LATEST_RELEASE` on `main` + copies already-built `releases/X.Y.Z/` to `releases/latest/` on `gh-pages` |
 | `build-check.yml` | push to any other branch, pull request to `main` or `release/*` (src changes), manual | nothing; `dist/` is uploaded as a run artifact only |
 
@@ -72,3 +101,10 @@ To promote a different version to latest:
 ## Building locally
 
 See `DEVELOPMENT.md` for prerequisites, setup, and build instructions.
+
+## Editing and publishing
+
+See [`PROCEDURES.md`](PROCEDURES.md) for step-by-step procedures: editing the
+current draft, publishing a named draft snapshot for review, creating a release,
+promoting a release to latest, and hotfixing a published release. It also carries
+the `src/config.js` checklist for drafts and releases.

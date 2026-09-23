@@ -4,7 +4,7 @@
 
 **mobilityDCAT-AP** is a European standard: an RDF/OWL application profile of DCAT-AP for describing mobility datasets, dataset services, and services across National Access Points (NAPs) in Europe. Maintained by [NAPCORE](https://napcore.eu/).
 
-This is a **proof-of-concept repository** for a proposed new repository structure. See `PLAN.md` for the branching strategy (`main` = draft, `release/vX.Y` branches, `draft/topic-name` for parallel work).
+This is a **proof-of-concept repository** for a proposed new repository structure. The branching and naming convention is defined once, in the branching table in `README.md`; `PROCEDURES.md` describes the editor-facing procedures that use it.
 
 ---
 
