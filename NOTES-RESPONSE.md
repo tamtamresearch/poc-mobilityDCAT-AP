@@ -1,7 +1,7 @@
 # Response to NOTES.md
 
-Date: 2026-09-21
-Repository state: `main` at `b3cf319`
+Date: 2026-09-23 (updated; first version 2026-09-21)
+Repository state: `main` at `637d686`
 
 This answers each point in `NOTES.md` (dated 2026-09-16) and records what has
 been done since. Several notes were already overtaken by the sync commit
@@ -71,40 +71,115 @@ exists under `drafts/latest`. The file it means is published at
 `https://mobilitydcat-ap.github.io/mobilityDCAT-AP/releases/1.0.1/mobilitydcat-ap_shacl_shapes.ttl`
 (the `w3id.org` form of that address returns 404).
 
-## 3) Draft naming convention — OPEN
+## 3) Draft naming convention — DONE
 
-The convention exists, but only as an example: README and the comment in
-`build-draft.yml` both use `draft/1.0.0-draft-0.1`, publishing to
-`drafts/1.0.0-draft-0.1/`. The guard in `build-draft.yml` only tests
-`^[0-9]+\.[0-9]+`, so a tag such as `draft/1.0-anything` passes. Once the
-pattern is agreed, tighten that regular expression to match it, so the rule is
-enforced and not merely documented.
+Agreed and implemented:
 
-`CLAUDE.md` still describes an older convention (`release/vX.Y`,
-`draft/topic-name`) and points to the deleted `PLAN.md`.
+| Ref | Kind | Publishes to |
+|-----|------|--------------|
+| `main` | branch | `drafts/latest/` |
+| `draft/X.Y.Z-draft.N[.C]` | tag | `drafts/X.Y.Z-draft.N[.C]/` |
+| `release/X.Y.Z` | branch | `releases/X.Y.Z/` |
 
-## 4) Document the repository by procedures — OPEN
+`X.Y.Z` is the version the draft works towards, `N` is the review round,
+counting from 1: `draft/3.0.0-draft.1`. The optional `C` is a correction
+published inside the same round, `draft/3.0.0-draft.1.1`, for the case where a
+snapshot has already been circulated and needs a fix that does not amount to a
+new review round. The plain `draft.N` stays the normal form.
 
-Agreed. The README is organised around the workflow files, which suits
-maintainers but not editors. The release sequence in the note is correct, but a
-step is missing: `config.js` has to be set for the release before the branch is
-pushed (see point 5). Worth adding as well: a hotfix to an already published
-release, and tagging a draft snapshot for review.
+That optional second number is the only addition to the pattern as agreed; it
+keeps the two-level form your `draft-0.1` example allowed. Dropping it again is
+one character in one regular expression, if you would rather the form stayed at
+a single number.
 
-## 5) config.js checklist for drafts and releases — OPEN
+The reason for this shape rather than the previous `1.0.0-draft-0.1`:
+`X.Y.Z-draft.N` is a valid SemVer pre-release, so ordering follows from the
+SemVer rules instead of a local convention. Identifiers are compared left to
+right, the numeric ones compare numerically rather than as text, and a longer
+set of identifiers sorts above a shorter one when everything before it is equal:
 
-Needed, and the current file shows why: on `main` (the draft) it carries
-`specStatus: "unofficial"` and a `canonicalURI` pointing at `drafts/latest`, but
-also `thisVersionURI: .../releases/3.0.0/` and `publishDate: "2026-10-01"`.
+```
+3.0.0-draft.1  <  3.0.0-draft.1.1  <  3.0.0-draft.2  <  3.0.0-draft.10  <  3.0.0
+```
 
-The checklist should cover at least `specStatus`, `publishDate`,
-`thisVersionURI`, `prevVersionURI`, `prevRecURI`, `canonicalURI`,
-`latestVersion` and `edDraftURI`.
+`1.0.0-draft-0.1` gives none of that, because `draft-0` is a single alphanumeric
+identifier and compares as text. The convention also matches how DCAT-AP labels
+its own drafts by target version.
 
-Some of these could be filled in by the workflow from the branch or tag name,
-which would shorten the manual checklist. Editing the built HTML afterwards
-should be avoided, because the next automated build overwrites it; anything
-that cannot be expressed in `config.js` belongs in `index.html`.
+The rule is now enforced rather than described: `build-draft.yml` rejects
+anything that is not `^[0-9]+\.[0-9]+\.[0-9]+(-draft\.[0-9]+(\.[0-9]+)?)?$` and
+`build-release.yml` rejects anything that is not `^[0-9]+\.[0-9]+\.[0-9]+$`, so
+a release branch cannot carry a pre-release suffix. Both guards were checked
+against `3.0.0`, `3.0.0-draft.1`, `3.0.0-draft.1.0`, `3.0.0-draft.1.1`,
+`3.0.0-draft.10` (accepted where intended) and `3.0`, `v3.0.0`, `3.0.0-draft`,
+`3.0.0-draft-0.1`, `3.0.0-draft.1.2.3`, `main` (rejected).
+
+The convention is stated once, in the README branching table. The workflow
+header comments and the workflow `name:` lines were corrected to match; both
+previously claimed a `vX.Y.Z` form that is not used anywhere. `CLAUDE.md` no
+longer points at the deleted `PLAN.md` and no longer describes `release/vX.Y` /
+`draft/topic-name`.
+
+## 4) Document the repository by procedures — DONE
+
+New `PROCEDURES.md` at the repository root, the editor-facing "how do I do X"
+document. `README.md` keeps describing the structure and the workflows,
+`DEVELOPMENT.md` keeps being the setup and build guide, and both now link to it.
+
+One section per procedure, each stating when it applies, the steps, and what
+lands where on `gh-pages`:
+
+1. Edit the current draft — branch, push, `build-check.yml` builds and publishes
+   nothing, PR, merge, `build-main.yml` refreshes `drafts/latest/`.
+2. Publish a named draft snapshot for review — set `config.js`, tag
+   `draft/X.Y.Z-draft.N` on `main`, push the tag. Includes the point that the
+   tag is permanent and the snapshot is never rebuilt, so a bad snapshot becomes
+   `-draft.N+1` rather than a moved tag.
+3. Create a release — set `config.js`, branch `release/X.Y.Z` from `main`, push.
+   The `config.js` checklist sits inside this procedure as a step, not as a
+   separate page.
+4. Promote a release to latest — run `promote-latest.yml`, then confirm
+   `LATEST_RELEASE` on `main` and the promote commit on `gh-pages`, which are
+   two separate commits on two branches.
+5. Hotfix a published release — commit on the existing `release/X.Y.Z` branch,
+   bump the patch version, push; with the note that a hotfix to a non-latest
+   branch leaves `releases/latest/` untouched, deliberately.
+
+The document closes with a single table mapping every ref you can push to the
+workflow it triggers and the directory it writes.
+
+## 5) config.js checklist for drafts and releases — DONE
+
+In `PROCEDURES.md`, inside procedure 3, as a table of field, line number, draft
+value and release value: `publishDate`, `specStatus`, `latestVersion`,
+`canonicalURI`, `prevRecURI`, `thisVersionURI`, `prevVersionURI`,
+`latestVersionURI` and `edDraftURI`.
+
+The checklist also covers two entries that are easy to miss because they are
+hard-coded `otherLinks` rows rather than ReSpec fields: "Document version"
+(`src/config.js:132-137`) and the "Previous version:" / "This version:" links
+(`:140-145`), each of which carries the version number twice, in `value` and in
+`href`. Those rows use the `mobilitydcat-ap.github.io` form of the URL while the
+ReSpec fields above use `w3id.org`; both resolve, so the checklist asks for
+internal consistency rather than unifying them.
+
+The motivating observation is stated in the document itself: `main` today
+carries `specStatus: "unofficial"` and `canonicalURI` pointing at
+`drafts/latest/`, alongside `thisVersionURI` pointing at `releases/3.0.0/` and a
+`publishDate` of `2026-10-01` — a mix of draft and release values.
+
+On your sub-point about post-build HTML adjustment: the document says not to
+edit the built HTML, because the next automated build overwrites `dist/`
+entirely, and that anything not expressible in `config.js` belongs in
+`src/index.html`.
+
+**Question for the meeting.** Four of these fields are a pure function of the
+ref that triggered the build and could be written into `config.js` by CI:
+`thisVersionURI`, `canonicalURI`, `publishDate` and `specStatus`. Two cannot be:
+`prevVersionURI` and `prevRecURI` need a human decision about which release is
+superseded. Automating the first group removes four manual steps, at the cost of
+a local build and a CI build producing different metadata from the same source.
+Not implemented; worth ten minutes of discussion.
 
 ## 6) Presentation of refactoring objectives — OPEN
 
@@ -149,21 +224,24 @@ import-based check as an option.
 
 ## Open actions
 
+Points 3, 4 and 5 are now done. What remains:
+
 1. Fix the `enterpriseArchitectFiles` link: copy the folder into `dist/` or link
-   to GitHub.
+   to GitHub. **Needs your decision**, because it is a change to
+   `src/index.html`; this repository treats the spec sources as read-only so
+   they do not diverge from upstream `drafts/latest`.
 2. Fix the stale 1.0.1 SHACL link in `index.html` to point at `releases/1.0.1/`.
-3. Agree the draft tag pattern, state it once in the README, and tighten the
-   regular expression in `build-draft.yml`.
-4. Write procedure-based documentation: edit the draft, tag a draft, create a
-   release, promote to latest, hotfix a release.
-5. Write the `config.js` checklist for drafts and releases, and decide which
-   fields CI can fill in.
-6. Build the presentation from `PRESENTATION-BRIEFING.md`.
-7. Drop or reconcile the colleague's timeout-fix branch against `d065a97`.
-8. Replace `CLAUDE.md` with a short `AGENTS.md` plus a `CLAUDE.md` that imports
-   it, and remove the remaining `PLAN.md` reference.
-9. Later: add a mise task for SHACL validation, with an offline mode that skips
-   the imports.
-10. `release/4.0.0` (local and on origin) sits at `17f77b1`, which predates the
-    ReSpec timeout fix, `build-check.yml` and the sync. Any push to it will
-    build without the fix. Bring it up to date with `main` or delete it.
+   Same constraint as above.
+3. Decide whether CI should fill in `thisVersionURI`, `canonicalURI`,
+   `publishDate` and `specStatus` from the branch or tag name (see point 5).
+4. Build the presentation from `PRESENTATION-BRIEFING.md` (point 6).
+5. Drop or reconcile the colleague's timeout-fix branch against `d065a97`.
+6. Replace `CLAUDE.md` with a short `AGENTS.md` plus a `CLAUDE.md` that imports
+   it (point 8). The stale `PLAN.md` reference in `CLAUDE.md` is already gone;
+   it now points at the README branching table instead.
+7. Later: add a mise task for SHACL validation, with an offline mode that skips
+   the imports (point 9).
+
+One observation for upstream, outside this repository: `src/shaclShapes/README.md:39`
+still references `drafts/1.1.0-draft-0.1/shaclShapes` in the old naming. It was
+left untouched here under the read-only rule.
