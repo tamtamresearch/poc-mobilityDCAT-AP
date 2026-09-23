@@ -116,9 +116,7 @@ against `3.0.0`, `3.0.0-draft.1`, `3.0.0-draft.1.0`, `3.0.0-draft.1.1`,
 
 The convention is stated once, in the README branching table. The workflow
 header comments and the workflow `name:` lines were corrected to match; both
-previously claimed a `vX.Y.Z` form that is not used anywhere. `CLAUDE.md` no
-longer points at the deleted `PLAN.md` and no longer describes `release/vX.Y` /
-`draft/topic-name`.
+previously claimed a `vX.Y.Z` form that is not used anywhere.
 
 ## 4) Document the repository by procedures — DONE
 
@@ -201,17 +199,40 @@ same locally.
 Action: the separate branch carrying the other version of this fix should be
 dropped or compared against `d065a97`, so the two do not conflict.
 
-## 8) Agent instructions interoperability — OPEN
+## 8) Agent instructions interoperability — DONE
 
-The emerging convention is `AGENTS.md`, not `agent.md`; several coding agents
-read it. Claude Code reads `CLAUDE.md`, so the usual arrangement is a one-line
-`CLAUDE.md` that imports `@AGENTS.md`.
+Your instinct was right, with one correction: the emerging convention is
+`AGENTS.md`, not `agent.md`, and several coding agents read it. Claude Code
+reads `CLAUDE.md`, so `CLAUDE.md` is now a single line, `@AGENTS.md`, and the
+content is vendor-neutral.
 
-There is a second reason to do this: `CLAUDE.md` largely duplicates the README
-and `DEVELOPMENT.md`, and duplication is what went stale (`PLAN.md`,
-`validationFiles/`, the old branch names). A short `AGENTS.md` that points at
-the README and `DEVELOPMENT.md` and adds only agent-specific rules would stay
-accurate by itself.
+The more interesting part was what to put in it. The old `CLAUDE.md` was 87
+lines that largely restated the README and `DEVELOPMENT.md`, and that
+duplication is exactly what went stale: it still listed `validationFiles/` and
+still described branch names we no longer use. Restating those documents in a
+third place guarantees the same outcome again.
+
+`AGENTS.md` therefore does not summarise them. It gives a table saying which of
+the three documents answers which question, and adds only what lives nowhere
+else:
+
+- **`src/` is read-only in this repository**, with the reason: it mirrors
+  upstream `drafts/latest`, and this repository exists to design a structure, so
+  editing spec content here would make the two diverge. `src/scripts/` is the
+  exception, being build tooling rather than content. An agent asked to fix one
+  of the known defects should now say so and stop, rather than quietly editing
+  `index.html`. This rule was applied throughout the work above but had not been
+  written down anywhere.
+- The `mise run lint` baseline: **1749 html-validate errors on an unmodified
+  tree**, coming from ReSpec's generated markup rather than from the sources. An
+  agent seeing that number cold reads it as 1749 defects to fix. It is a
+  comparison baseline, and a change in it means something under `src/` moved.
+- The LF rule from `.gitattributes` and why it exists, since a CRLF checkout
+  silently changes the content of multi-line RDF literals.
+- The commit subject prefixes this history uses (`CI:`, `Docs:`, `Dev:`).
+
+The result is 83 lines that should not go stale, because nothing in it is a copy
+of something maintained elsewhere.
 
 ## 9) Dev mode SHACL validation — AGREED AS FUTURE WORK
 
@@ -224,7 +245,7 @@ import-based check as an option.
 
 ## Open actions
 
-Points 3, 4 and 5 are now done. What remains:
+Points 3, 4, 5 and 8 are now done. What remains:
 
 1. Fix the `enterpriseArchitectFiles` link: copy the folder into `dist/` or link
    to GitHub. **Needs your decision**, because it is a change to
@@ -236,10 +257,7 @@ Points 3, 4 and 5 are now done. What remains:
    `publishDate` and `specStatus` from the branch or tag name (see point 5).
 4. Build the presentation from `PRESENTATION-BRIEFING.md` (point 6).
 5. Drop or reconcile the colleague's timeout-fix branch against `d065a97`.
-6. Replace `CLAUDE.md` with a short `AGENTS.md` plus a `CLAUDE.md` that imports
-   it (point 8). The stale `PLAN.md` reference in `CLAUDE.md` is already gone;
-   it now points at the README branching table instead.
-7. Later: add a mise task for SHACL validation, with an offline mode that skips
+6. Later: add a mise task for SHACL validation, with an offline mode that skips
    the imports (point 9).
 
 One observation for upstream, outside this repository: `src/shaclShapes/README.md:39`
