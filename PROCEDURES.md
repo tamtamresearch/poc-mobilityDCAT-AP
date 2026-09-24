@@ -45,7 +45,7 @@ normal, everyday case.
 2. Edit under `src/`, and build locally before pushing:
 
    ```sh
-   mise run lint      # full build + HTML validation + broken reference check
+   mise run lint      # full build, then HTML, reference and SHACL checks
    ```
 
    See `DEVELOPMENT.md` for the individual steps.

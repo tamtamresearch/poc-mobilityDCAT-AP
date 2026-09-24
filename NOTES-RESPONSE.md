@@ -192,9 +192,9 @@ Fixed on `main` in `d065a97`. `build-spec.py` now runs
 ("Navigation timeout ... 620 ms") has the same cause as the one seen in CI:
 ReSpec's default limit of 10 s covers the whole run, browser launch included.
 
-The `npx respec` fallback was not added and does not appear to be needed: CI
-puts `node_modules/.bin` on `PATH` (`reusable-build.yml:48`), and mise does the
-same locally.
+The `npx respec` fallback was not added and does not appear to be needed: mise
+puts `node_modules/.bin` on `PATH` (the `[env]` section of `.mise.toml`), and CI
+now runs the build through mise as well (see point 9).
 
 Action: the separate branch carrying the other version of this fix should be
 dropped or compared against `d065a97`, so the two do not conflict.
@@ -234,18 +234,68 @@ else:
 The result is 83 lines that should not go stale, because nothing in it is a copy
 of something maintained elsewhere.
 
-## 9) Dev mode SHACL validation — AGREED AS FUTURE WORK
+## 9) Dev mode SHACL validation — DONE
 
-`pyshacl` is already a dependency and unused, so the groundwork is there. One
-practical note for when it is picked up: `imports.ttl` pulls in external
-vocabularies (DCAT, Dublin Core, FOAF, LOCN and others) and `mdr-imports.ttl`
-adds 21 more `owl:imports`. A local task should be able to validate against
-`shapes.ttl` and `ranges.ttl` without network access, with the full
-import-based check as an option.
+`mise run validate-examples` runs `src/scripts/validate-examples.py`, which
+validates `src/examples/*.ttl` (or files given on the command line) with pyshacl
+against the four constraint files in `src/shaclShapes/`. Usage is in
+`DEVELOPMENT.md`.
+
+The note scoped this as a local command with CI later. It went a step further:
+it is the last step of a new `mise run check` task, which `mise run lint` runs
+after the build. CI now calls the same mise tasks instead of repeating each
+step: `reusable-build.yml` sets up mise and runs `mise run build`, then
+`mise run check` with `continue-on-error`. A violation shows in the build log
+but does not block a publish. Making it blocking is a one-line change once the
+questions below are settled.
+
+The offline mode sketched above turned out not to be useful as first thought.
+Without the controlled vocabularies loaded, every `skos:inScheme` check in
+`mdr-vocabularies.ttl` fails, so the output is all noise. The script
+instead downloads the `owl:imports` once, about 8 MB in 20 seconds, into a
+gitignored `.cache/shacl/`, and `--offline` then works from that cache in about
+2 seconds. How the imports are used:
+
+- The `mdr-imports.ttl` codelists go into the data graph, since membership is
+  checked there. Results on the codelists' own nodes are not reported.
+- Imports that contain shapes, meaning the DCAT-AP 3.0.1 `shapes.ttl` and
+  `deprecateduris.ttl`, go into the shapes graph.
+- The DCAT-AP `range.ttl` is left out unless `--with-dcat-ap-ranges` is given.
+  With it the examples report 27 violations of the form "Value does not have
+  class dct:Frequency", because the EU authority tables type their concepts
+  only as `skos:Concept`. Whether that file is meant to apply is a question for
+  you.
+- No inference. RDFS inference over DCAT 2 makes every `dcat:Catalog` a
+  `dcat:Dataset`, so the Dataset rules fire on the catalog.
+
+Current result: no violations in either example, 4 warnings on the minimum and
+6 on the complete one. Three of them are worth a look upstream:
+
+- `spatial` warns on both examples. They put the country IRI directly on
+  `dct:spatial`, while the rule in `mdr-vocabularies.ttl` follows
+  `dct:spatial / dct:identifier`. Either the examples or the rule is wrong.
+- `adms:status` on the complete example's distribution warns through DCAT-AP's
+  own `deprecateduris.ttl`, which wants the old ADMS status list. The example
+  uses the EU Distribution status table, as `mdr-vocabularies.ttl` requires, so
+  this looks like a DCAT-AP defect inherited through `imports.ttl`.
+- `publisher` is not from the EU Corporate body table. Expected, since the
+  publisher is a Swedish agency; listed only so it is not mistaken for a bug.
+
+Two import URLs are also broken or fragile. `imports.ttl` imports
+`https://schema.org/version/30.0/schemaorg-current-https.ttl`, which returns 404.
+`dublincore.org` returns 403 to the default Python user agent, so the script
+sends its own.
+
+The ontology `src/mobilitydcat-ap.ttl` is not validated. The profile shapes
+target catalogs, datasets and distributions, and it contains none. A separate
+vocabulary check, for example that every term has a label, comment and term
+status, is possible; a quick count finds 75 reused terms without `rdfs:label`
+and 122 terms also typed `owl:NamedIndividual`. It would need rules agreed with
+you first, so it is only a suggestion.
 
 ## Open actions
 
-Points 3, 4, 5 and 8 are now done. What remains:
+Points 3, 4, 5, 8 and 9 are now done. What remains:
 
 1. Fix the `enterpriseArchitectFiles` link: copy the folder into `dist/` or link
    to GitHub. **Needs your decision**, because it is a change to
@@ -257,9 +307,14 @@ Points 3, 4, 5 and 8 are now done. What remains:
    `publishDate` and `specStatus` from the branch or tag name (see point 5).
 4. Build the presentation from `PRESENTATION-BRIEFING.md` (point 6).
 5. Drop or reconcile the colleague's timeout-fix branch against `d065a97`.
-6. Later: add a mise task for SHACL validation, with an offline mode that skips
-   the imports (point 9).
+6. Decide whether the DCAT-AP `range.ttl` should apply to the examples, and
+   whether the `spatial` mismatch is in the examples or in the rule (point 9).
 
-One observation for upstream, outside this repository: `src/shaclShapes/README.md:39`
-still references `drafts/1.1.0-draft-0.1/shaclShapes` in the old naming. It was
-left untouched here under the read-only rule.
+Observations for upstream, outside this repository, left untouched here under
+the read-only rule:
+
+- `src/shaclShapes/README.md:39` still references
+  `drafts/1.1.0-draft-0.1/shaclShapes` in the old naming.
+- `src/shaclShapes/imports.ttl` imports a schema.org 30.0 URL that returns 404.
+- DCAT-AP 3.0.1 `deprecateduris.ttl`, imported by `imports.ttl`, warns on
+  `adms:status` values from the EU Distribution status table (point 9).

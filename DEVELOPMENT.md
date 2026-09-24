@@ -51,15 +51,48 @@ mise run build-spec   # copy assets to dist/ and build dist/index.html via ReSpe
 ## Linting
 
 ```sh
-mise run lint         # full build + HTML validation + broken local references
+mise run lint         # full build, then mise run check
+mise run check        # all three checks below, on an existing build
 mise run validate     # HTML markup validation only (requires a prior build)
 ```
 
-`mise run lint` runs the full build, then:
+`mise run lint` runs the full build, then `mise run check`, which:
 1. Validates `dist/index.html` markup with `html-validate` (rules defined in `.htmlvalidate.json`)
 2. Parses `dist/index.html` with `src/scripts/check-refs.py`, which cross-references all `id` attributes against all `href="#..."` links and prints each broken one
+3. Validates the examples against the SHACL shapes with `src/scripts/validate-examples.py` (see [Validating the examples](#validating-the-examples))
 
 ReSpec only reports a count of broken references in its CLI output — `check-refs.py` gives the actual list.
+
+The checks run in this order and the first failure stops the task, so a broken
+reference means the SHACL validation does not run. `html-validate` never stops
+it: its 1749 errors come from the ReSpec-generated markup and are a baseline,
+not a failure.
+
+## Validating the examples
+
+```sh
+mise run validate-examples                  # src/examples/*.ttl against the SHACL shapes
+mise run validate-examples -- --offline     # use only the cached imports
+mise run validate-examples -- path/to/file.ttl
+```
+
+The shapes are the four constraint files in `src/shaclShapes/`. What they
+`owl:import` is downloaded on the first run (about 8 MB, 20 seconds) into
+`.cache/shacl/` and reused afterwards; `--refresh` downloads it again. The
+controlled vocabularies from `mdr-imports.ttl` go into the data graph, because
+the membership checks look them up there, and the DCAT-AP 3.0.1 base shapes go
+into the shapes graph. Only results on nodes of the validated file are printed.
+The task exits 1 on any `sh:Violation`; warnings are printed only.
+
+The DCAT-AP `range.ttl` is left out unless `--with-dcat-ap-ranges` is given. Its
+`sh:class` checks need an explicit type on every value, which the EU authority
+tables do not carry, so on the current examples it reports every codelist value.
+Validation runs without inference: RDFS inference over DCAT 2 makes every
+`dcat:Catalog` a `dcat:Dataset` and applies the Dataset rules to it.
+
+It is the last step of `mise run check`, so it runs in `mise run lint` and in CI.
+CI keeps `.cache/shacl/` between runs, under a key that changes each month and
+whenever a file in `src/shaclShapes/` changes.
 
 ## Live preview
 
@@ -78,6 +111,7 @@ Open `http://localhost:8080/src/index.html` in a browser. ReSpec runs live and s
 | Serialise | `src/scripts/serialise.py` | Parses each `.ttl` with rdflib, writes `.rdf` and `.jsonld` to `dist/` |
 | Copy assets | `src/scripts/copy-assets.py` | Copies the Turtle sources, examples, figures, and SHACL shapes to `dist/` |
 | Build spec | `src/scripts/build-spec.py` | Calls `respec --localhost`, which spins up its own HTTP server, builds `dist/index.html`, and shuts down |
+| Validate examples | `src/scripts/validate-examples.py` | Runs pyshacl on the examples; separate from the build |
 
 `--localhost` is required because Chromium (used internally by ReSpec) blocks `file://` requests needed by `data-include`. All paths (`src/index.html` → `dist/index.html`) are defined in `build-spec.py`.
 
@@ -110,7 +144,7 @@ Turtle is the source format for the ontology and the examples. The `.rdf` and `.
 | uv | latest | mise | Python package manager |
 | Python | 3.12 | uv | Runtime for build scripts |
 | rdflib | 7.6.0 | uv / `pyproject.toml` | RDF serialisation |
-| pyshacl | 0.31.0 | uv / `pyproject.toml` | SHACL validation (optional) |
+| pyshacl | 0.31.0 | uv / `pyproject.toml` | SHACL validation of the examples |
 
 - `.mise.toml` — pins Node and uv versions
 - `package.json` — pins respec
@@ -119,7 +153,12 @@ Turtle is the source format for the ontology and the examples. The `.rdf` and `.
 
 ## CI
 
-Every publishing workflow runs the same pipeline as `mise run lint`, through the
-reusable workflow `.github/workflows/reusable-build.yml`. Which ref publishes
+Every publishing workflow builds through the reusable workflow
+`.github/workflows/reusable-build.yml`, which runs the same mise tasks as
+`mise run lint`, with the same tool versions from `.mise.toml`:
+`mise run install`, `mise run build`, then `mise run check`. The build is
+enforced; `check` runs with `continue-on-error`, so a failed check shows in the
+log but does not stop a publish. A new check therefore goes into the `check`
+task, not into the workflow. Which ref publishes
 where is listed in `README.md`; the step-by-step procedures are in
 [`PROCEDURES.md`](PROCEDURES.md).

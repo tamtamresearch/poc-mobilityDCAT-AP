@@ -7,3 +7,6 @@ node_modules/
 
 # Python virtual environment (managed by uv)
 .venv/
+
+# Downloaded SHACL imports, reused by validate-examples.py
+.cache/

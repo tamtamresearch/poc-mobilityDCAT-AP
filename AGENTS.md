@@ -53,10 +53,10 @@ the examples. The `.rdf` and `.jsonld` serialisations are produced by
 ## Verifying a change
 
 ```sh
-mise run lint      # full build + HTML validation + broken reference check
+mise run lint      # full build + HTML validation + broken reference check + SHACL validation
 ```
 
-Two things to know about the output, so they are not mistaken for regressions
+Three things to know about the output, so they are not mistaken for regressions
 introduced by the change at hand:
 
 - `html-validate` reports **1749 errors** on an unmodified tree. They come from
@@ -65,6 +65,10 @@ introduced by the change at hand:
   `src/` was touched.
 - `check-refs.py` should report **no broken local references**. ReSpec prints
   only a count; this script prints the actual list.
+- `validate-examples.py` should report **no violations**, with 4 warnings on
+  `example-minimum.ttl` and 6 on `example-complete.ttl`. The warnings are known
+  and recorded in `NOTES-RESPONSE.md` point 9. Its first run downloads the
+  SHACL imports, and a failed download of the schema.org import is expected.
 
 ## Conventions
 

@@ -41,13 +41,25 @@ depends = ["build-spec"]
 description = "Validate dist/index.html markup with html-validate"
 run = "html-validate dist/index.html"
 
-[tasks.lint]
-description = "Build spec, validate markup, and list all broken local references"
-depends = ["build"]
+# No build dependency, so CI can run the build and the checks as separate steps:
+# a failed build must stop a publish, a failed check is only reported there
+[tasks.check]
+description = "Validate markup, list broken local references, validate the examples (requires a prior build)"
 run = [
   "html-validate dist/index.html || true",
   "uv run python src/scripts/check-refs.py",
+  "uv run python src/scripts/validate-examples.py",
 ]
+
+[tasks.lint]
+description = "Full build, then all checks"
+depends = ["build"]
+run = [{ task = "check" }]
+
+# The first run downloads the SHACL imports (~8 MB) into .cache/
+[tasks.validate-examples]
+description = "Validate src/examples/*.ttl against the SHACL shapes (imports cached in .cache/)"
+run = "uv run python src/scripts/validate-examples.py"
 
 [tasks.serve]
 description = "Serve repo over HTTP for live ReSpec preview with interactive warnings"
