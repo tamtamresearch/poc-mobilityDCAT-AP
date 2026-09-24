@@ -20,7 +20,10 @@ on:
     paths:
       - 'src/**'
       - 'package.json'
+      - 'package-lock.json'
       - 'pyproject.toml'
+      - 'uv.lock'
+      - '.mise.toml'
       - '.github/workflows/build-check.yml'
       - '.github/workflows/reusable-build.yml'
   pull_request:
@@ -28,7 +31,10 @@ on:
     paths:
       - 'src/**'
       - 'package.json'
+      - 'package-lock.json'
       - 'pyproject.toml'
+      - 'uv.lock'
+      - '.mise.toml'
       - '.github/workflows/build-check.yml'
       - '.github/workflows/reusable-build.yml'
   workflow_dispatch:

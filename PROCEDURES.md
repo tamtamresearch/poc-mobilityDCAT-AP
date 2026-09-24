@@ -66,10 +66,12 @@ normal, everyday case.
 
 **Result on `gh-pages`:** `drafts/latest/` is refreshed. Nothing else moves.
 
-**Note:** `build-main.yml` and `build-check.yml` are path-filtered to `src/**`,
-`package.json` and `pyproject.toml`. A pull request that only touches
-documentation does not trigger a build, which is expected; `drafts/latest/` is
-unaffected by it either way.
+**Note:** `build-main.yml` and `build-check.yml` are path-filtered to what can
+change the build: `src/**`, the dependency files (`package.json`,
+`package-lock.json`, `pyproject.toml`, `uv.lock`), `.mise.toml`, which holds the
+tool versions and the tasks CI runs, and their own workflow files. A pull
+request that only touches documentation does not trigger a build, which is
+expected; `drafts/latest/` is unaffected by it either way.
 
 ---
 

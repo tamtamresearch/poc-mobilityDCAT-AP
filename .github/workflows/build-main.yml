@@ -9,7 +9,13 @@ on:
     paths:                      # only run when these change
       - 'src/**'                # source files
       - 'package.json'          # Node (npm) packages
+      - 'package-lock.json'
       - 'pyproject.toml'        # Python packages
+      - 'uv.lock'
+      - '.mise.toml'            # tool versions and the build tasks CI runs
+      - '.github/workflows/build-main.yml'
+      - '.github/workflows/reusable-build.yml'
+      - '.github/workflows/reusable-publish-gh-pages.yml'
   workflow_dispatch:
 
 jobs:
