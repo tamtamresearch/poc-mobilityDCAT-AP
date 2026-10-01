@@ -23,7 +23,7 @@ stale last time.
 
 | Question | Document |
 |----------|----------|
-| What is in the repository, which workflow publishes where, the branch and tag naming convention | `README.md` |
+| What is in the repository, which workflow publishes where, the branch and tag naming convention, a summary of each procedure | `README.md` |
 | How to install the toolchain, build, lint, preview | `DEVELOPMENT.md` |
 | How to edit the draft, publish a snapshot, cut a release, promote it, hotfix it, and what to set in `config.js` | `PROCEDURES.md` |
 

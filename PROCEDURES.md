@@ -7,9 +7,9 @@ The three documents divide as follows:
 
 | Document | Answers |
 |----------|---------|
-| `README.md` | What is in the repository, which workflow publishes where |
+| `README.md` | What is in the repository, the naming convention, which workflow publishes where, and a one-paragraph summary of each procedure |
 | `DEVELOPMENT.md` | How to install the toolchain and build locally |
-| `PROCEDURES.md` (this file) | How do I do X |
+| `PROCEDURES.md` (this file) | How do I do X, step by step |
 
 Each procedure below states when it applies, the steps, and what lands where on
 the `gh-pages` branch. The refs used are the ones defined in the branching table

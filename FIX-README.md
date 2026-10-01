@@ -171,7 +171,8 @@ the table below it.
 It says the README covers only what is in the repository and which workflow
 publishes where. The README now also summarises the procedures.
 
-Status: open
+Status: fixed. The map in `PROCEDURES.md` and the matching table in
+`AGENTS.md` now include the procedure summaries and the naming convention.
 
 ### 17. The "open question for the meeting" text is meeting-specific
 
