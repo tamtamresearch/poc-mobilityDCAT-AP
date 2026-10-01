@@ -115,7 +115,8 @@ The snippets under Publish a draft snapshot and Create a release skip
 `git switch main` and `git pull`. Copied as they are, they tag or branch from
 whatever is checked out.
 
-Status: open
+Status: fixed by the commits for 1 and 2, which rewrote both snippets to start
+with `git switch main` and `git pull`.
 
 ### 11. The README says the build checks the examples
 
