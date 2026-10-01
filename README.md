@@ -161,9 +161,9 @@ the expected output of the checks are in [`DEVELOPMENT.md`](DEVELOPMENT.md).
 
 Every change to what is published follows one of five procedures. Each is
 summarised here; the full steps, checks and edge cases are in
-[`PROCEDURES.md`](PROCEDURES.md). Publishing a draft snapshot, creating a
-release and hotfixing one also involve setting the snapshot or release values in
-`src/config.js`, following `PROCEDURES.md`, section
+[`PROCEDURES.md`](PROCEDURES.md). Creating a release and hotfixing one also
+involve setting the release values in `src/config.js`, following
+`PROCEDURES.md`, section
 [`config.js` checklist: draft vs release](PROCEDURES.md#configjs-checklist-draft-vs-release).
 
 ### Edit the current draft
@@ -177,19 +177,18 @@ Full procedure: `PROCEDURES.md`, section [Edit the current draft](PROCEDURES.md#
 ### Publish a draft snapshot for review
 
 When a version of the draft has to stay at a stable URL, for reviewers or a
-meeting agenda. On a local branch from `main`, commit the snapshot values in
-`config.js`, tag that commit and push only the tag:
+meeting agenda. Tag the current `main` and push the tag; `config.js` is not
+changed:
 
 ```sh
 git switch main
 git pull
-git switch -c snapshot/3.0.0-draft.1
-# set the snapshot values in src/config.js and commit
 git tag draft/3.0.0-draft.1
 git push origin draft/3.0.0-draft.1
 ```
 
-The snapshot values never go to `main`, which keeps its draft values.
+The snapshot keeps the draft values of `main`, so its "This version" link
+points at `drafts/latest/`. Send reviewers the snapshot's own URL.
 
 `build-draft.yml` publishes `drafts/3.0.0-draft.1/`. No later push rebuilds a
 snapshot; do not move its tag or rebuild it by hand. If it is wrong, publish

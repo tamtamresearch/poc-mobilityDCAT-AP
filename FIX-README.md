@@ -23,8 +23,10 @@ before its first push and never merged to `main`.
 snapshot values to `main` before tagging. `drafts/latest/` then advertises the
 snapshot URL as its canonical URL, and nothing resets it.
 
-Status: fixed. The snapshot values are now committed on a local branch that is
-never pushed; only the tag pointing at that commit is pushed.
+Status: fixed. First by committing the snapshot values on a local branch that
+was never pushed. That was then replaced by a simpler rule: a snapshot does not
+change `config.js` at all. The tag points at `main` as it is, and the
+snapshot's header links to `drafts/latest/`, which `PROCEDURES.md` now states.
 
 ### 3. The hotfix version guidance contradicts itself
 

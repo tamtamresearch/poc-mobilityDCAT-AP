@@ -98,41 +98,31 @@ overwrites it.
    that does not amount to a new review round; otherwise use the plain
    `draft.N`.
 
-2. Start a local branch from `main`. It is never pushed; it only holds the
-   commit the tag will point at:
+2. Tag the current `main` and push the tag. `src/config.js` is not changed for
+   a snapshot: it publishes with the same draft values as `drafts/latest/`.
 
    ```sh
    git switch main
    git pull
-   git switch -c snapshot/3.0.0-draft.1
-   ```
-
-3. Set the snapshot values in `src/config.js`, following the
-   [`config.js` checklist](#configjs-checklist-draft-vs-release) under
-   Create a release, and commit them. Do not merge this change to `main`: a
-   merge to `main` publishes `drafts/latest/`, which must keep pointing at
-   itself.
-
-4. Build locally, tag the commit, push only the tag, and drop the local
-   branch:
-
-   ```sh
    mise run lint
    git tag draft/3.0.0-draft.1
    git push origin draft/3.0.0-draft.1
-   git switch main
-   git branch -D snapshot/3.0.0-draft.1
    ```
 
-   The tagged commit is not on `main`, and that is intended: the tag keeps it
-   reachable, and `main` never carries snapshot values.
-
-5. `build-draft.yml` extracts the version by stripping the `draft/` prefix,
+3. `build-draft.yml` extracts the version by stripping the `draft/` prefix,
    validates it against `^[0-9]+\.[0-9]+\.[0-9]+(-draft\.[0-9]+(\.[0-9]+)?)?$`,
    builds, and publishes.
 
 **Result on `gh-pages`:** `drafts/3.0.0-draft.1/`. `drafts/latest/` is untouched;
 it stays managed by `build-main.yml`.
+
+**The snapshot's header still describes `drafts/latest/`.** Because
+`config.js` is not changed, "This version" and the canonical link on the
+snapshot page point at `drafts/latest/`, not at the snapshot. The text is
+frozen; only those self-links are generic. When sending a snapshot out, give
+its own URL, `drafts/3.0.0-draft.1/`, rather than the link in its header.
+Giving each snapshot its own header would need CI to write those values; see
+[What CI could fill in, and what it cannot](#what-ci-could-fill-in-and-what-it-cannot).
 
 **Treat the snapshot as permanent.** No push re-triggers `build-draft.yml` for
 an existing tag, so the published folder keeps showing the state of the source
@@ -208,14 +198,14 @@ for example `specStatus: "unofficial"` and `canonicalURI` pointing at
 `drafts/latest/`, next to a `thisVersionURI` pointing at `releases/3.0.0/`.
 Check the whole table each time, not only the fields you came to change.
 
-| Field | Draft (`main`, `draft/*`) | Release (`release/X.Y.Z`) |
+| Field | Draft (`main`, and every `draft/*` snapshot taken from it) | Release (`release/X.Y.Z`) |
 |-------|---------------------------|---------------------------|
-| `publishDate` | the date the draft snapshot is published, or omitted on `main` | the release date |
+| `publishDate` | omitted, so ReSpec shows the build date | the release date |
 | `specStatus` | `"unofficial"` | the agreed published status (see [ReSpec specStatus](https://respec.org/docs/#specStatus)) |
 | `latestVersion` | `https://w3id.org/mobilitydcat-ap/releases/` | unchanged |
-| `canonicalURI` | `.../drafts/latest/`, or `.../drafts/X.Y.Z-draft.N/` for a tagged snapshot | `.../releases/X.Y.Z/` |
+| `canonicalURI` | `.../drafts/latest/` | `.../releases/X.Y.Z/` |
 | `prevRecURI` | the last formally published release | the last formally published release |
-| `thisVersionURI` | the draft's own URL, matching `canonicalURI` | `.../releases/X.Y.Z/` |
+| `thisVersionURI` | `.../drafts/latest/`, matching `canonicalURI` | `.../releases/X.Y.Z/` |
 | `prevVersionURI` | the release this draft supersedes | the release this one supersedes |
 | `latestVersionURI` | `https://w3id.org/mobilitydcat-ap/releases/` | unchanged |
 | `edDraftURI` | `.../drafts/latest/` | `.../drafts/latest/` (the editor's draft is always `main`) |
@@ -241,7 +231,9 @@ build overwrites `dist/` entirely. Anything that cannot be expressed in
 ### What CI could fill in, and what it cannot
 
 Four of the fields above are a pure function of the ref that triggered the build,
-and a workflow step could write them into `config.js` before the ReSpec build:
+and a workflow step could write them into `config.js` before the ReSpec build.
+For a draft snapshot, which publishes `main`'s values unchanged, this is the
+only way it could get a header naming its own URL:
 
 - `thisVersionURI` and `canonicalURI` — derivable from the branch or tag name,
   which the `extract-version` job already parses.
