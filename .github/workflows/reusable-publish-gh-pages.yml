@@ -17,6 +17,12 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    # One writer per directory at a time; a newer publish of the same
+    # directory replaces a pending older one. Different directories run in
+    # parallel and are reconciled by the push retry below.
+    concurrency:
+      group: gh-pages-${{ inputs.destination_dir }}
+      cancel-in-progress: false
 
     steps:
       - name: Download dist artifact
@@ -41,4 +47,14 @@ jobs:
           cp -r ../dist/. "${{ inputs.destination_dir }}/"
           git add -A
           git commit -m "chore: publish ${{ inputs.destination_dir }}" || echo "Nothing to publish"
-          git push
+          # Another workflow may have pushed to gh-pages since the checkout, for
+          # example publish and publish-latest in the same release run. They
+          # write different directories, so a rebase onto the new tip is clean.
+          for attempt in 1 2 3 4 5; do
+            if git push; then exit 0; fi
+            echo "gh-pages moved since checkout; rebasing (attempt $attempt)"
+            git fetch origin gh-pages
+            git rebase origin/gh-pages
+          done
+          echo "ERROR: could not push to gh-pages after 5 attempts." >&2
+          exit 1

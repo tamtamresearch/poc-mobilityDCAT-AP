@@ -61,7 +61,9 @@ rejected as non-fast-forward. That breaks the "rebuilt in the same run" promise
 in `PROCEDURES.md` and `README.md`. Nothing serialises the workflows that push
 to `gh-pages`, so two of them running at once can collide the same way.
 
-Status: open
+Status: fixed. Jobs writing the same `gh-pages` directory now share a
+concurrency group, and a push rejected because `gh-pages` moved is rebased and
+retried. Not yet exercised on GitHub.
 
 ### 6. Failed checks do not stop a publish, and neither document says so
 
