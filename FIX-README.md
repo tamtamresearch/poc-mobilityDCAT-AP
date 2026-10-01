@@ -130,7 +130,7 @@ Status: fixed. The sentence now names `mise run check`.
 `serve.py` serves the repository root; the page is at
 `http://localhost:<port>/src/index.html`.
 
-Status: open
+Status: fixed. The README now gives `http://localhost:8080/src/index.html`.
 
 ### 13. Installation may be missing `mise trust`
 

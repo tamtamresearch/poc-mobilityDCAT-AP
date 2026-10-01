@@ -138,7 +138,9 @@ mise run lint       # build, then HTML validation, broken reference check and SH
 mise run serve      # serve the repository for a live ReSpec preview
 ```
 
-Open `dist/index.html` to see the built specification. The individual steps and
+Open `dist/index.html` to see the built specification. `mise run serve`
+renders the source instead, with ReSpec running in the browser and showing its
+warnings: open `http://localhost:8080/src/index.html`. The individual steps and
 the expected output of the checks are in [`DEVELOPMENT.md`](DEVELOPMENT.md).
 
 ## Procedures
