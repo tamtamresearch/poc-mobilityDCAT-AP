@@ -179,4 +179,5 @@ Status: fixed. The map in `PROCEDURES.md` and the matching table in
 `PROCEDURES.md`, What CI could fill in, and what it cannot. It will read oddly
 once the meeting has happened.
 
-Status: open
+Status: fixed. The paragraph now says the question is undecided and points to
+`NOTES-RESPONSE.md`, point 5, where it is recorded.

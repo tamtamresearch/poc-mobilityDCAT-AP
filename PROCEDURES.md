@@ -253,8 +253,8 @@ Two cannot be derived and need a human decision:
 - `prevVersionURI` — which release this one supersedes.
 - `prevRecURI` — which release counts as the last formally published one.
 
-Whether to automate the first group is **an open question for the meeting**, not
-something implemented here. The trade-off: it removes four manual steps from this
+Whether to automate the first group is undecided and not implemented here; the
+question is recorded in `NOTES-RESPONSE.md`, point 5. The trade-off: it removes four manual steps from this
 checklist, but it makes a local build and a CI build produce different metadata
 from the same source, which is a real cost when debugging a published page.
 
