@@ -160,12 +160,19 @@ Full procedure: `PROCEDURES.md`, section [Edit the current draft](PROCEDURES.md#
 ### Publish a draft snapshot for review
 
 When a version of the draft has to stay at a stable URL, for reviewers or a
-meeting agenda. Tag the commit on `main` and push the tag:
+meeting agenda. On a local branch from `main`, commit the snapshot values in
+`config.js`, tag that commit and push only the tag:
 
 ```sh
+git switch main
+git pull
+git switch -c snapshot/3.0.0-draft.1
+# set the snapshot values in src/config.js and commit
 git tag draft/3.0.0-draft.1
 git push origin draft/3.0.0-draft.1
 ```
+
+The snapshot values never go to `main`, which keeps its draft values.
 
 `build-draft.yml` publishes `drafts/3.0.0-draft.1/`. A snapshot is never rebuilt
 or moved; if it is wrong, publish `draft.1.1` or `draft.2` instead.

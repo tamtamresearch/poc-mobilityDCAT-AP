@@ -95,21 +95,36 @@ overwrites it.
    that does not amount to a new review round; otherwise use the plain
    `draft.N`.
 
-2. Set the draft values in `src/config.js`, following the
-   [`config.js` checklist](#configjs-checklist-draft-vs-release) under
-   Create a release, and merge that change to `main` as in
-   [Edit the current draft](#edit-the-current-draft).
-
-3. Tag the commit on `main` and push the tag:
+2. Start a local branch from `main`. It is never pushed; it only holds the
+   commit the tag will point at:
 
    ```sh
    git switch main
    git pull
-   git tag draft/3.0.0-draft.1
-   git push origin draft/3.0.0-draft.1
+   git switch -c snapshot/3.0.0-draft.1
    ```
 
-4. `build-draft.yml` extracts the version by stripping the `draft/` prefix,
+3. Set the snapshot values in `src/config.js`, following the
+   [`config.js` checklist](#configjs-checklist-draft-vs-release) under
+   Create a release, and commit them. Do not merge this change to `main`: a
+   merge to `main` publishes `drafts/latest/`, which must keep pointing at
+   itself.
+
+4. Build locally, tag the commit, push only the tag, and drop the local
+   branch:
+
+   ```sh
+   mise run lint
+   git tag draft/3.0.0-draft.1
+   git push origin draft/3.0.0-draft.1
+   git switch main
+   git branch -D snapshot/3.0.0-draft.1
+   ```
+
+   The tagged commit is not on `main`, and that is intended: the tag keeps it
+   reachable, and `main` never carries snapshot values.
+
+5. `build-draft.yml` extracts the version by stripping the `draft/` prefix,
    validates it against `^[0-9]+\.[0-9]+\.[0-9]+(-draft\.[0-9]+(\.[0-9]+)?)?$`,
    builds, and publishes.
 
