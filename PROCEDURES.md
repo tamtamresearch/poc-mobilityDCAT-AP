@@ -201,33 +201,33 @@ Do not delete it after publishing.
 
 ### `config.js` checklist: draft vs release
 
-All of these live in `src/config.js`. The current file is a useful warning: on
-`main`, which is the living draft, it carries `specStatus: "unofficial"` and
-`canonicalURI` pointing at `drafts/latest/`, but at the same time
-`thisVersionURI` pointing at `releases/3.0.0/` and a `publishDate` of
-`2026-10-01`. That is a mix of draft and release values, and it is what this
-checklist exists to prevent.
+All of these live in `src/config.js`; search for the field name or the
+`otherLinks` key, since line numbers move with every upstream change. The
+mistake this checklist exists to prevent is a mix of draft and release values:
+for example `specStatus: "unofficial"` and `canonicalURI` pointing at
+`drafts/latest/`, next to a `thisVersionURI` pointing at `releases/3.0.0/`.
+Check the whole table each time, not only the fields you came to change.
 
-| Field | Line | Draft (`main`, `draft/*`) | Release (`release/X.Y.Z`) |
-|-------|------|---------------------------|---------------------------|
-| `publishDate` | 17 | the date the draft snapshot is published, or omitted on `main` | the release date |
-| `specStatus` | 59 | `"unofficial"` | the agreed published status (see [ReSpec specStatus](https://respec.org/docs/#specStatus)) |
-| `latestVersion` | 61 | `https://w3id.org/mobilitydcat-ap/releases/` | unchanged |
-| `canonicalURI` | 63 | `.../drafts/latest/`, or `.../drafts/X.Y.Z-draft.N/` for a tagged snapshot | `.../releases/X.Y.Z/` |
-| `prevRecURI` | 64 | the last formally published release | the last formally published release |
-| `thisVersionURI` | 66 | the draft's own URL, matching `canonicalURI` | `.../releases/X.Y.Z/` |
-| `prevVersionURI` | 67 | the release this draft supersedes | the release this one supersedes |
-| `latestVersionURI` | 68 | `https://w3id.org/mobilitydcat-ap/releases/` | unchanged |
-| `edDraftURI` | 70 | `.../drafts/latest/` | `.../drafts/latest/` (the editor's draft is always `main`) |
+| Field | Draft (`main`, `draft/*`) | Release (`release/X.Y.Z`) |
+|-------|---------------------------|---------------------------|
+| `publishDate` | the date the draft snapshot is published, or omitted on `main` | the release date |
+| `specStatus` | `"unofficial"` | the agreed published status (see [ReSpec specStatus](https://respec.org/docs/#specStatus)) |
+| `latestVersion` | `https://w3id.org/mobilitydcat-ap/releases/` | unchanged |
+| `canonicalURI` | `.../drafts/latest/`, or `.../drafts/X.Y.Z-draft.N/` for a tagged snapshot | `.../releases/X.Y.Z/` |
+| `prevRecURI` | the last formally published release | the last formally published release |
+| `thisVersionURI` | the draft's own URL, matching `canonicalURI` | `.../releases/X.Y.Z/` |
+| `prevVersionURI` | the release this draft supersedes | the release this one supersedes |
+| `latestVersionURI` | `https://w3id.org/mobilitydcat-ap/releases/` | unchanged |
+| `edDraftURI` | `.../drafts/latest/` | `.../drafts/latest/` (the editor's draft is always `main`) |
 
-Two more entries carry version numbers by hand and are easy to miss, because they
+Three more entries carry version numbers by hand and are easy to miss, because they
 are hard-coded `otherLinks` rows rather than ReSpec fields:
 
-| Entry | Line | What to set |
-|-------|------|-------------|
-| `otherLinks` → "Document version" | 132-137 | the version number being published |
-| `otherLinks` → "Previous version:" | 140-141 | `value` and `href`, both the previous release URL |
-| `otherLinks` → "This version:" | 144-145 | `value` and `href`, both this version's URL |
+| Entry | What to set |
+|-------|-------------|
+| `otherLinks` → "Document version" | the version number being published |
+| `otherLinks` → "Previous version:" | `value` and `href`, both the previous release URL |
+| `otherLinks` → "This version:" | `value` and `href`, both this version's URL |
 
 Note that the `otherLinks` rows use `https://mobilitydcat-ap.github.io/mobilityDCAT-AP/...`
 while the ReSpec fields above use `https://w3id.org/mobilitydcat-ap/...`. The two

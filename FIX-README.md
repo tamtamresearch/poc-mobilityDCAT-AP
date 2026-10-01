@@ -161,7 +161,10 @@ The line numbers in the `config.js` checklist and the "current file is a useful
 warning" paragraph describe today's file. They are correct now, but the next
 upstream sync can silently invalidate them.
 
-Status: open
+Status: fixed. The line-number columns are gone, the text says to search by
+field name, and the warning paragraph describes the mistake instead of the
+current file. The same commit corrects "Two more entries" to three, matching
+the table below it.
 
 ### 16. The document map in `PROCEDURES.md` is out of date
 
