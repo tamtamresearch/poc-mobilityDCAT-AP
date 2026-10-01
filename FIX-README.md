@@ -123,7 +123,7 @@ with `git switch main` and `git pull`.
 `README.md`, Sources and build output, says the build checks the examples
 against the SHACL shapes. `mise run check` does that, not `mise run build`.
 
-Status: open
+Status: fixed. The sentence now names `mise run check`.
 
 ### 12. The `mise run serve` line does not say which URL to open
 

@@ -21,7 +21,8 @@ The ontology, `src/mobilitydcat-ap.ttl`, and the worked examples in
 and JSON-LD serialisations are produced by the build and never committed.
 
 The SHACL shapes in `src/shaclShapes/` are the validation constraints of the
-profile. The build checks the examples against them.
+profile. `mise run check`, run after the build, validates the examples against
+them.
 
 Everything hand-authored lives in `src/`. The build writes everything it
 produces to `dist/`, which is emptied at the start of each build and must not be
