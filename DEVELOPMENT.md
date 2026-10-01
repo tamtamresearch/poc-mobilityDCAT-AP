@@ -28,6 +28,7 @@ scoop install mise
 ## First-time setup
 
 ```sh
+mise trust            # once per clone: .mise.toml sets environment variables, so mise asks first
 mise install          # installs Node 24 and uv (uv installs Python 3.12 automatically)
 mise run install      # npm install + uv sync (creates .venv with all Python dependencies)
 ```

@@ -138,7 +138,9 @@ Status: fixed. The README now gives `http://localhost:8080/src/index.html`.
 to load such a file on a fresh clone until it is trusted. Neither `README.md` nor
 `DEVELOPMENT.md` mentions it. Not yet confirmed on a fresh clone.
 
-Status: open
+Status: fixed. Confirmed with mise 2026.4.25 on a fresh copy of `.mise.toml`:
+every command fails with "Config files ... are not trusted" until
+`mise trust` is run. Both install sections now start with it.
 
 ### 14. Configuration covers only the `gh-pages` branch
 

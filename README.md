@@ -105,6 +105,7 @@ Install [mise](https://mise.jdx.dev/getting-started.html), then in the project
 folder:
 
 ```sh
+mise trust          # once per clone; mise refuses an untrusted .mise.toml
 mise install        # Node.js and uv at the pinned versions
 mise run install    # npm install + uv sync
 ```
