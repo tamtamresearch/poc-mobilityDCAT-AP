@@ -49,7 +49,9 @@ missing directory makes the workflow fail cleanly; in fact `main` is left
 pointing at an unpublished version, and the next push to that release branch
 would publish it to `releases/latest/`. The version input is not validated.
 
-Status: open
+Status: fixed. `promote-latest.yml` now validates the version and checks the
+directory before writing anything, and a repeated run for the same version no
+longer fails on an empty commit.
 
 ### 5. Hotfixing the latest release can fail to update `releases/latest/`
 

@@ -262,8 +262,9 @@ deliberate step; no version becomes latest on its own.
 **Steps**
 
 1. Confirm `releases/X.Y.Z/` already exists on `gh-pages`. `promote-latest.yml`
-   copies what is published; it does not build. It fails with an explicit error
-   if the directory is not there.
+   copies what is published; it does not build. It checks this itself before
+   changing anything, and rejects a version that is not `X.Y.Z`, so a mistake
+   leaves both `main` and `gh-pages` untouched.
 
 2. Actions tab → **Promote release to releases/latest** → Run workflow → enter
    the version, for example `3.0.0`.
