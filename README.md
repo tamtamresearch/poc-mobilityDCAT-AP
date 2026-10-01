@@ -49,8 +49,11 @@ with upstream; specification changes are made upstream, not here.
 
 ## Published versions
 
-Every built version is a directory on the `gh-pages` branch, served under
-`https://w3id.org/mobilitydcat-ap/`.
+Every built version is a directory on the `gh-pages` branch, served by GitHub
+Pages. This proof of concept is served at
+`https://tamtamresearch.github.io/poc-mobilityDCAT-AP/`. The persistent address
+`https://w3id.org/mobilitydcat-ap/` redirects to the upstream site, not to this
+one.
 
 The editor's draft, `drafts/latest/`, is always the current `main`.
 
@@ -125,9 +128,19 @@ A local build needs no settings, credentials or environment variables.
 | Version, dates and URLs shown in the specification | `src/config.js`; the values differ between a draft and a release, see `PROCEDURES.md`, section [`config.js` checklist: draft vs release](PROCEDURES.md#configjs-checklist-draft-vs-release) |
 | Which release `releases/latest/` points at | `LATEST_RELEASE` on `main`, changed through `promote-latest.yml` |
 
-Publishing needs a `gh-pages` branch in the GitHub repository, with GitHub Pages
-serving from it. The publish workflow checks that branch out and fails if it
-does not exist.
+Publishing depends on three things outside the repository files:
+
+- A `gh-pages` branch, with GitHub Pages serving from it. The publish workflow
+  checks that branch out and fails if it does not exist.
+- Direct pushes to `main` from GitHub Actions. `promote-latest.yml` commits
+  `LATEST_RELEASE` to `main`, so a branch protection rule that blocks direct
+  pushes to `main` breaks promotion.
+- The `https://w3id.org/mobilitydcat-ap/` redirect, which is registered with
+  the [w3id.org](https://w3id.org/) service, not configured here. It points at
+  the upstream Pages site, `https://mobilitydcat-ap.github.io/mobilityDCAT-AP/`,
+  and negotiates the format: a browser gets `index.html`, other clients get
+  the Turtle file. Moving the published site means changing the redirect
+  there.
 
 # Usage
 

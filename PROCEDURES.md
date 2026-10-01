@@ -21,8 +21,11 @@ in [`README.md`](README.md#branching-and-naming-convention):
 | `draft/X.Y.Z-draft.N[.C]` | tag | `drafts/X.Y.Z-draft.N[.C]/` |
 | `release/X.Y.Z` | branch | `releases/X.Y.Z/` |
 
-Everything published lives on the `gh-pages` branch and is served from
-`https://w3id.org/mobilitydcat-ap/`.
+Everything published lives on the `gh-pages` branch and is served by GitHub
+Pages: for this proof of concept at
+`https://tamtamresearch.github.io/poc-mobilityDCAT-AP/`, upstream at
+`https://w3id.org/mobilitydcat-ap/`, which redirects to the upstream Pages
+site.
 
 ---
 
@@ -285,8 +288,8 @@ deliberate step; no version becomes latest on its own.
    git log -1 --oneline origin/gh-pages         # promote commit for releases/latest
    ```
 
-   Then open `https://w3id.org/mobilitydcat-ap/releases/latest/` and check the
-   version shown on the page.
+   Then open `releases/latest/` on the published site and check the version
+   shown on the page.
 
 **Result on `gh-pages`:** `releases/latest/` becomes a copy of `releases/X.Y.Z/`.
 On `main`, `LATEST_RELEASE` now reads `X.Y.Z`.

@@ -148,7 +148,10 @@ The `https://w3id.org/mobilitydcat-ap/` redirect to GitHub Pages is maintained
 outside this repository. `promote-latest.yml` pushes to `main`, so protecting
 `main` against direct pushes would break promotion. Neither is mentioned.
 
-Status: open
+Status: fixed. Configuration now lists the `gh-pages` branch, direct pushes to
+`main` and the w3id redirect. Checking the redirect showed it points at the
+upstream Pages site, not at this repository, so the places that said this
+repository is served at the w3id address now give its own Pages URL.
 
 ## Upkeep
 
