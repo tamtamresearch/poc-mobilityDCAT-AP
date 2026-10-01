@@ -145,7 +145,7 @@ the expected output of the checks are in [`DEVELOPMENT.md`](DEVELOPMENT.md).
 Every change to what is published follows one of five procedures. Each is
 summarised here; the full steps, checks and edge cases are in
 [`PROCEDURES.md`](PROCEDURES.md). Publishing a draft snapshot, creating a
-release and hotfixing one also involve setting the draft or release values in
+release and hotfixing one also involve setting the snapshot or release values in
 `src/config.js`, following `PROCEDURES.md`, section
 [`config.js` checklist: draft vs release](PROCEDURES.md#configjs-checklist-draft-vs-release).
 
@@ -173,13 +173,18 @@ Full procedure: `PROCEDURES.md`, section [Publish a named draft snapshot for rev
 
 ### Create a release
 
-When a version is final. Merge the release values in `config.js` to `main`, then
-create the release branch from `main` and push it:
+When a version is final. Create the release branch from `main`, set the
+release values in `config.js` on that branch only, and push it:
 
 ```sh
+git switch main
+git pull
 git switch -c release/3.0.0
+# set the release values in src/config.js and commit
 git push -u origin release/3.0.0
 ```
+
+The release values never go to `main`, which keeps its draft values.
 
 `build-release.yml` publishes `releases/3.0.0/`. The branch is long-lived and
 must not be deleted, because hotfixes are made on it.

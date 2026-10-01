@@ -14,7 +14,8 @@ Each item records its status; a fix updates the status in the same commit.
 pointing at `releases/3.0.0/`, which is the draft/release mix the `config.js`
 checklist warns against. No step resets `main` to draft values afterwards.
 
-Status: open
+Status: fixed. The release values are now committed on the release branch
+before its first push and never merged to `main`.
 
 ### 2. Publishing a draft snapshot has the same problem
 

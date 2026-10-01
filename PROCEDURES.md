@@ -131,25 +131,40 @@ it is a correction within the round, `-draft.N+1` if it is the next round.
 
 **Steps**
 
-1. On a branch off `main`, set the release values in `src/config.js` (checklist
-   below) and merge that change to `main` as in
-   [Edit the current draft](#edit-the-current-draft). Doing it on `main` first
-   keeps the draft and the release branch from diverging immediately.
-
-2. Create the release branch from `main` and push it:
+1. Make sure every change meant for the release is merged to `main`, then
+   create the release branch from it locally. Do not push it yet: the first
+   push publishes.
 
    ```sh
    git switch main
    git pull
    git switch -c release/3.0.0
+   ```
+
+2. On the release branch, set the release values in `src/config.js` (checklist
+   below) and commit them. Do not merge this change to `main`: a merge to
+   `main` publishes `drafts/latest/`, and the draft must keep its draft values.
+   The release branch and `main` therefore differ in `config.js` from the
+   start, which is intended.
+
+3. Build locally, then push the branch:
+
+   ```sh
+   mise run lint
    git push -u origin release/3.0.0
    ```
 
-3. `build-release.yml` extracts the version from the branch name, validates it
+   To have the release values reviewed before they are published, push the
+   same commit to a branch with another name first, for example
+   `git push origin release/3.0.0:prepare/3.0.0`. `build-check.yml` builds it
+   without publishing, and the built `dist/` is attached to the run. Delete
+   that branch once the release branch is pushed.
+
+4. `build-release.yml` extracts the version from the branch name, validates it
    against `^[0-9]+\.[0-9]+\.[0-9]+$` (no pre-release suffix is accepted on a
    release branch), builds, and publishes.
 
-4. The same workflow reads `LATEST_RELEASE` from `main` with a sparse checkout
+5. The same workflow reads `LATEST_RELEASE` from `main` with a sparse checkout
    and compares it to the branch version. If they match, a second `publish-latest`
    job also deploys to `releases/latest/`. For a brand new version they will not
    match yet; promote it as in
