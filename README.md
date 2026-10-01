@@ -217,8 +217,10 @@ Otherwise, branch from `origin/release/X.Y.Z` and open a pull request against
 `release/X.Y.Z`; see `PROCEDURES.md`, section
 [Hotfix with a pull request](PROCEDURES.md#hotfix-with-a-pull-request).
 
-Either way, keep the fix in a commit separate from the version entries in
-`config.js`. Publishing rebuilds `releases/X.Y.Z/`, and also `releases/latest/`
+Either way, the version number stays the same and only `publishDate` changes in
+`config.js`; keep the fix in a commit separate from that change. A correction
+that needs a new version number is a new release branch, such as
+`release/3.0.1`, instead. Publishing rebuilds `releases/X.Y.Z/`, and also `releases/latest/`
 if `LATEST_RELEASE` names that version; a hotfix to an older release leaves
 `releases/latest/` alone. Cherry-pick the fix commit to `main` too, or the next
 release ships the defect again.

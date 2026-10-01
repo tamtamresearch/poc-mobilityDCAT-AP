@@ -35,7 +35,9 @@ say 3.0.1. The next sentence says a new version number calls for
 `canonicalURI` as entries to update, but they do not change for a hotfix on the
 same branch.
 
-Status: open
+Status: fixed. A hotfix now keeps the version number and changes only
+`publishDate`; a change that needs a new version number is a new release branch
+cut from the old one.
 
 ## Where the documents and the workflows disagree
 

@@ -303,7 +303,14 @@ hotfix branch cannot accidentally promote itself.
 **When:** a correction has to reach an already published release without waiting
 for the next version.
 
-There are two ways to do it. Pushing straight to the release branch is quicker
+A hotfix rewrites `releases/3.0.0/` in place and keeps the version number. Use
+it for corrections that do not change what the release specifies, such as a
+typo or a broken link. A change that warrants a new version number is a new
+release instead: branch `release/3.0.1` from `origin/release/3.0.0`, not from
+`main`, and continue with step 2 of [Create a release](#create-a-release).
+`releases/3.0.0/` then stays as it was published.
+
+There are two ways to do a hotfix. Pushing straight to the release branch is quicker
 but publishes without review; going through a pull request adds a review and a
 build check before anything is published. Both end with the same result.
 
@@ -336,18 +343,15 @@ use [Hotfix with a pull request](#hotfix-with-a-pull-request) instead.
    ```
 
 2. Make the fix under `src/` and commit it on its own, without the `config.js`
-   changes from the next step. A separate commit is what lets the fix be
+   change from the next step. A separate commit is what lets the fix be
    cherry-picked to `main` later without the release metadata.
 
-3. Update the version-bearing entries from the
-   [`config.js` checklist](#configjs-checklist-draft-vs-release): `publishDate`,
-   `thisVersionURI`, `canonicalURI`, and the `otherLinks` rows, and bump the
-   patch version. Commit this separately. The branch name stays
-   `release/3.0.0`; the branch is the release line, and `config.js` records the
-   published version. If the correction is substantive enough to warrant a new
-   version number, create `release/3.0.1` from `release/3.0.0` as in
-   [Create a release](#create-a-release) instead; the two approaches differ in
-   whether `releases/3.0.0/` is rewritten or left standing.
+3. Set `publishDate` in `src/config.js` to the date of the hotfix and commit it
+   separately. Nothing else in the
+   [`config.js` checklist](#configjs-checklist-draft-vs-release) changes: the
+   page stays at `releases/3.0.0/` under the same version number, so the
+   version, `thisVersionURI`, `canonicalURI` and the `otherLinks` rows stay as
+   they are.
 
 4. Build locally, then push. The push triggers `build-release.yml`, which
    builds `release/3.0.0` and publishes it, exactly as it does for a new release
@@ -390,7 +394,7 @@ correction, or `release/*` is protected against direct pushes.
    Any name that is not `main`, `release/*` or `gh-pages` works, as in
    [Edit the current draft](#edit-the-current-draft).
 
-2. Commit the fix and the `config.js` changes as two separate commits, as in
+2. Commit the fix and the `publishDate` change as two separate commits, as in
    steps 2 and 3 of
    [Hotfix without a pull request](#hotfix-without-a-pull-request).
 
