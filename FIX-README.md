@@ -103,7 +103,9 @@ release branch, and a note below it explains why.
 `PROCEDURES.md`, Publish a named draft snapshot for review. A manual run from
 that tag rebuilds and overwrites the snapshot.
 
-Status: open
+Status: fixed. Both documents now say that no push rebuilds a snapshot, that a
+manual run from the tag would, and that it should not be done to a snapshot
+that has gone out.
 
 ## Smaller inaccuracies in the README
 

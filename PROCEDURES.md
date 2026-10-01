@@ -131,11 +131,15 @@ overwrites it.
 **Result on `gh-pages`:** `drafts/3.0.0-draft.1/`. `drafts/latest/` is untouched;
 it stays managed by `build-main.yml`.
 
-**The snapshot is permanent and is never rebuilt.** Nothing re-triggers
-`build-draft.yml` for an existing tag, so the published folder keeps showing the
-state of the source at the moment the tag was pushed. If a snapshot turns out to
-be wrong, publish a new tag rather than moving the existing one: `-draft.N.C` if
-it is a correction within the round, `-draft.N+1` if it is the next round.
+**Treat the snapshot as permanent.** No push re-triggers `build-draft.yml` for
+an existing tag, so the published folder keeps showing the state of the source
+at the moment the tag was pushed. The one way to rebuild it is a manual run of
+`build-draft.yml` from that tag, which overwrites the folder; the result can
+differ from what reviewers saw if anything the build fetches has changed since,
+so do not do it to a snapshot that has gone out. If a snapshot turns out to be
+wrong, publish a new tag rather than moving or rebuilding the existing one:
+`-draft.N.C` if it is a correction within the round, `-draft.N+1` if it is the
+next round.
 
 ---
 

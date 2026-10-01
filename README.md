@@ -174,8 +174,9 @@ git push origin draft/3.0.0-draft.1
 
 The snapshot values never go to `main`, which keeps its draft values.
 
-`build-draft.yml` publishes `drafts/3.0.0-draft.1/`. A snapshot is never rebuilt
-or moved; if it is wrong, publish `draft.1.1` or `draft.2` instead.
+`build-draft.yml` publishes `drafts/3.0.0-draft.1/`. No later push rebuilds a
+snapshot; do not move its tag or rebuild it by hand. If it is wrong, publish
+`draft.1.1` or `draft.2` instead.
 Full procedure: `PROCEDURES.md`, section [Publish a named draft snapshot for review](PROCEDURES.md#publish-a-named-draft-snapshot-for-review).
 
 ### Create a release
