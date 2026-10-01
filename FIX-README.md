@@ -95,7 +95,8 @@ A manual run of `build-draft.yml` or `build-release.yml` fails unless the tag or
 release branch is selected as the ref, because the version validation fails
 otherwise.
 
-Status: open
+Status: fixed. The table now says each manual run must start from the tag or
+release branch, and a note below it explains why.
 
 ### 9. "Nothing re-triggers `build-draft.yml` for an existing tag" is too strong
 

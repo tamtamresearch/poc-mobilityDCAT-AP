@@ -234,10 +234,15 @@ build the ref and write the result to `gh-pages`.
 | Workflow | Trigger | Publishes to |
 |----------|---------|-------------|
 | `build-main.yml` | push to `main` changing the build inputs, manual | `drafts/latest/` |
-| `build-draft.yml` | push of a `draft/*` tag, manual | `drafts/X.Y.Z-draft.N[.C]/` |
-| `build-release.yml` | push to `release/*`, manual | `releases/X.Y.Z/`, and `releases/latest/` if `LATEST_RELEASE` names this version |
+| `build-draft.yml` | push of a `draft/*` tag, manual run from that tag | `drafts/X.Y.Z-draft.N[.C]/` |
+| `build-release.yml` | push to `release/*`, manual run from that branch | `releases/X.Y.Z/`, and `releases/latest/` if `LATEST_RELEASE` names this version |
 | `promote-latest.yml` | manual only | sets `LATEST_RELEASE` on `main` and copies the already-built `releases/X.Y.Z/` to `releases/latest/` |
 | `build-check.yml` | push to any other branch, pull request to `main` or `release/*`, manual | nothing; `dist/` is uploaded as a run artifact |
+
+A manual run of `build-draft.yml` or `build-release.yml` takes its version from
+the ref it runs on, so pick the `draft/*` tag or the `release/*` branch under
+"Use workflow from" in the Actions tab. Run from any other ref, the version
+check fails and nothing is built.
 
 The four workflows that build all do it through `reusable-build.yml`, which
 runs `mise run build` and then `mise run check`. The three that publish a build
