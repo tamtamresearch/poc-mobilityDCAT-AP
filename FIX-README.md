@@ -72,7 +72,10 @@ reference or a SHACL violation is still published, including on a merged hotfix
 pull request. Hotfix without a pull request says the local build is the only
 check; that is effectively true of every procedure.
 
-Status: open
+Status: fixed. Both documents now say that checks are reported, not enforced,
+and that `mise run lint` before a push is what catches a failure. Making the
+checks blocking is a separate decision; `DEVELOPMENT.md` describes the current
+behaviour as intended.
 
 ### 7. Two descriptions of the workflows are wrong
 

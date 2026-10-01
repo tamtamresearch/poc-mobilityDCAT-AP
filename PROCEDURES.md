@@ -328,8 +328,9 @@ too, apply it to that branch as well, the same way.
 
 **When:** the fix is small and urgent, such as a broken link or a typo, and
 someone with push access to the release branch takes responsibility for it.
-Nobody reviews the change before it is live, so the local build is the only
-check. If `release/*` is protected against direct pushes, the push is rejected;
+Nobody reviews the change before it is live, and CI does not stop a publish
+when a check fails (see [Where things end up](#where-things-end-up)), so the
+local `mise run lint` is what catches a mistake. If `release/*` is protected against direct pushes, the push is rejected;
 use [Hotfix with a pull request](#hotfix-with-a-pull-request) instead.
 
 **Steps**
@@ -432,3 +433,10 @@ All five publishing workflows share the same build through
 `reusable-publish-gh-pages.yml`, which pre-cleans the target directory before
 writing. A published directory therefore never keeps a file that has been
 removed from the source.
+
+The checks are reported, not enforced. A failed build stops a publish, but a
+failed `mise run check` (invalid markup, a broken reference, a SHACL violation)
+only shows as a failed step in the run log; the run still succeeds and
+publishes. Run `mise run lint` locally before pushing anything that publishes,
+and look at the check step of the run afterwards. This applies to every procedure above, including a
+merged pull request.

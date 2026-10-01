@@ -242,3 +242,9 @@ build the ref and write the result to `gh-pages`.
 All of them build through `reusable-build.yml`, which runs `mise run build` and
 then `mise run check`, and deploy through `reusable-publish-gh-pages.yml`, which
 empties the target directory before writing so no removed file survives.
+
+The checks are reported, not enforced. A failed build stops a publish, but a
+failed `mise run check` (invalid markup, a broken reference, a SHACL violation)
+only shows as a failed step in the run log; the run still succeeds and
+publishes. Run `mise run lint` locally before pushing anything that publishes,
+and look at the check step of the run afterwards.
