@@ -89,18 +89,29 @@ def download(url: str) -> Graph:
     raise ValueError(f"not parseable as RDF (Content-Type {ctype})")
 
 
-def load_import(url: str, offline: bool, refresh: bool) -> Graph | None:
+def missing_effect(declared_in: str) -> str:
+    """What a missing import means for the results, by the file declaring it."""
+    if declared_in == VOCABULARY_IMPORTS:
+        return "codelist missing: every membership check against it fails"
+    if declared_in == BASE_IMPORTS:
+        return "results affected only if it holds shapes; vocabularies are not used"
+    return "shapes missing: their constraints are not applied"
+
+
+def load_import(url: str, declared_in: str, offline: bool, refresh: bool) -> Graph | None:
     """Return the imported graph, from the cache when possible, or None."""
     path = cache_path(url)
     if path.exists() and not refresh:
         return Graph().parse(path, format="nt")
     if offline:
         print(f"  not cached, skipped: {url}")
+        print(f"         declared in {declared_in}; {missing_effect(declared_in)}")
         return None
     try:
         g = download(url)
     except Exception as e:
         print(f"  FAILED {url}: {e}")
+        print(f"         declared in {declared_in}; {missing_effect(declared_in)}")
         return None
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     g.serialize(path, format="nt", encoding="utf-8")
@@ -127,7 +138,7 @@ def build_graphs(args) -> tuple[Graph, Graph]:
     print("== Load imports ==")
     vocabularies = Graph()
     for url in imports_of(VOCABULARY_IMPORTS):
-        g = load_import(url, args.offline, args.refresh)
+        g = load_import(url, VOCABULARY_IMPORTS, args.offline, args.refresh)
         if g is not None:
             vocabularies += g
 
@@ -136,7 +147,7 @@ def build_graphs(args) -> tuple[Graph, Graph]:
             if name == RANGE_FILE and not args.with_dcat_ap_ranges:
                 print(f"  left out (see --with-dcat-ap-ranges): {url}")
                 continue
-            g = load_import(url, args.offline, args.refresh)
+            g = load_import(url, name, args.offline, args.refresh)
             if g is not None and has_shapes(g):
                 shapes += g
     return shapes, vocabularies
