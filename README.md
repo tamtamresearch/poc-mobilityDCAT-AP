@@ -239,9 +239,13 @@ build the ref and write the result to `gh-pages`.
 | `promote-latest.yml` | manual only | sets `LATEST_RELEASE` on `main` and copies the already-built `releases/X.Y.Z/` to `releases/latest/` |
 | `build-check.yml` | push to any other branch, pull request to `main` or `release/*`, manual | nothing; `dist/` is uploaded as a run artifact |
 
-All of them build through `reusable-build.yml`, which runs `mise run build` and
-then `mise run check`, and deploy through `reusable-publish-gh-pages.yml`, which
-empties the target directory before writing so no removed file survives.
+The four workflows that build all do it through `reusable-build.yml`, which
+runs `mise run build` and then `mise run check`. The three that publish a build
+(`build-main.yml`, `build-draft.yml` and `build-release.yml`) deploy through
+`reusable-publish-gh-pages.yml`, which empties the target directory before
+writing so no removed file survives. `promote-latest.yml` neither builds nor
+uses that workflow: it replaces `releases/latest/` with a copy of a directory
+already on `gh-pages`.
 
 The checks are reported, not enforced. A failed build stops a publish, but a
 failed `mise run check` (invalid markup, a broken reference, a SHACL violation)

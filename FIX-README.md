@@ -85,7 +85,9 @@ neither and `build-check.yml` does not deploy. `PROCEDURES.md`, Where things end
 up, refers to "all five publishing workflows" sharing the build; only four
 build, and only three of those publish through it.
 
-Status: open
+Status: fixed. Both passages now name which workflows build, which publish
+through `reusable-publish-gh-pages.yml`, and what `promote-latest.yml` does
+instead.
 
 ### 8. "Manual" in the README Workflows table hides a catch
 

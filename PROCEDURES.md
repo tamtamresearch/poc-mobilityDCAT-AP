@@ -428,11 +428,13 @@ correction, or `release/*` is protected against direct pushes.
 | `release/X.Y.Z` branch | `build-release.yml` | `releases/X.Y.Z/`, plus `releases/latest/` if marked |
 | (manual run) | `promote-latest.yml` | `releases/latest/`, and `LATEST_RELEASE` on `main` |
 
-All five publishing workflows share the same build through
-`reusable-build.yml`, and all deployment goes through
+The four workflows that build (`build-check.yml`, `build-main.yml`,
+`build-draft.yml` and `build-release.yml`) share the same build through
+`reusable-build.yml`. The three of them that publish deploy through
 `reusable-publish-gh-pages.yml`, which pre-cleans the target directory before
-writing. A published directory therefore never keeps a file that has been
-removed from the source.
+writing, so a published directory never keeps a file that has been removed
+from the source. `promote-latest.yml` builds nothing; it replaces
+`releases/latest/` with a copy of an already published `releases/X.Y.Z/`.
 
 The checks are reported, not enforced. A failed build stops a publish, but a
 failed `mise run check` (invalid markup, a broken reference, a SHACL violation)
