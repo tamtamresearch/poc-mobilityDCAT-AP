@@ -26,7 +26,7 @@ Everything published lives on the `gh-pages` branch and is served from
 
 ---
 
-## 1. Edit the current draft
+## Edit the current draft
 
 **When:** any change to the specification that is not yet a release. This is the
 normal, everyday case.
@@ -75,7 +75,7 @@ expected; `drafts/latest/` is unaffected by it either way.
 
 ---
 
-## 2. Publish a named draft snapshot for review
+## Publish a named draft snapshot for review
 
 **When:** a version of the draft has to stay reachable at a stable URL, for
 example to send to reviewers or to reference from a meeting agenda.
@@ -95,9 +95,10 @@ overwrites it.
    that does not amount to a new review round; otherwise use the plain
    `draft.N`.
 
-2. Set the draft values in `src/config.js` — see the
-   [checklist](#configjs-checklist-draft-vs-release) in procedure 3 — and merge
-   that change to `main` through procedure 1.
+2. Set the draft values in `src/config.js`, following the
+   [`config.js` checklist](#configjs-checklist-draft-vs-release) under
+   Create a release, and merge that change to `main` as in
+   [Edit the current draft](#edit-the-current-draft).
 
 3. Tag the commit on `main` and push the tag:
 
@@ -123,7 +124,7 @@ it is a correction within the round, `-draft.N+1` if it is the next round.
 
 ---
 
-## 3. Create a release
+## Create a release
 
 **When:** a version of the specification is final and should be published under
 `releases/`.
@@ -131,8 +132,9 @@ it is a correction within the round, `-draft.N+1` if it is the next round.
 **Steps**
 
 1. On a branch off `main`, set the release values in `src/config.js` (checklist
-   below) and merge that change to `main` through procedure 1. Doing it on `main`
-   first keeps the draft and the release branch from diverging immediately.
+   below) and merge that change to `main` as in
+   [Edit the current draft](#edit-the-current-draft). Doing it on `main` first
+   keeps the draft and the release branch from diverging immediately.
 
 2. Create the release branch from `main` and push it:
 
@@ -150,13 +152,15 @@ it is a correction within the round, `-draft.N+1` if it is the next round.
 4. The same workflow reads `LATEST_RELEASE` from `main` with a sparse checkout
    and compares it to the branch version. If they match, a second `publish-latest`
    job also deploys to `releases/latest/`. For a brand new version they will not
-   match yet; use procedure 4 to promote it.
+   match yet; promote it as in
+   [Promote a release to `releases/latest/`](#promote-a-release-to-releaseslatest).
 
 **Result on `gh-pages`:** `releases/3.0.0/`, and `releases/latest/` as well if
 `LATEST_RELEASE` on `main` already reads `3.0.0`.
 
 **The release branch is long-lived.** It stays in the repository so hotfixes can
-be made on it (procedure 5). Do not delete it after publishing.
+be made on it (see [Hotfix a published release](#hotfix-a-published-release)).
+Do not delete it after publishing.
 
 ### `config.js` checklist: draft vs release
 
@@ -219,7 +223,7 @@ from the same source, which is a real cost when debugging a published page.
 
 ---
 
-## 4. Promote a release to `releases/latest/`
+## Promote a release to `releases/latest/`
 
 **When:** a published release should become the one that
 `https://w3id.org/mobilitydcat-ap/releases/latest/` points at. This is always a
@@ -264,43 +268,117 @@ hotfix branch cannot accidentally promote itself.
 
 ---
 
-## 5. Hotfix a published release
+## Hotfix a published release
 
 **When:** a correction has to reach an already published release without waiting
 for the next version.
 
-**Steps**
-
-1. Check out the existing release branch:
-
-   ```sh
-   git switch release/3.0.0
-   git pull
-   ```
-
-2. Make the fix under `src/`, and bump the patch version. The branch name stays
-   `release/3.0.0` — the branch is the release line, and `config.js` records the
-   published version. If the correction is substantive enough to warrant a new
-   version number, create `release/3.0.1` from `release/3.0.0` through procedure
-   3 instead; the two approaches differ in whether `releases/3.0.0/` is rewritten
-   or left standing.
-
-3. Update the version-bearing entries in `config.js` from the checklist in
-   procedure 3: `publishDate`, `thisVersionURI`, `canonicalURI`, and the
-   `otherLinks` rows.
-
-4. Push. `build-release.yml` runs exactly as it does for a new release branch.
+There are two ways to do it. Pushing straight to the release branch is quicker
+but publishes without review; going through a pull request adds a review and a
+build check before anything is published. Both end with the same result.
 
 **Result on `gh-pages`:** `releases/3.0.0/` is rebuilt. If `LATEST_RELEASE` on
-`main` reads `3.0.0`, `releases/latest/` is rebuilt in the same run.
+`main` reads `3.0.0`, `releases/latest/` is rebuilt in the same run. Bringing
+the fix to `main` refreshes `drafts/latest/` when it is merged.
 
 **A hotfix to a branch that is not the latest leaves `releases/latest/`
 untouched.** That is the intended behaviour: correcting an old release must not
 change what current readers see. If the fix does belong in the latest release
-too, apply it to that branch as well.
+too, apply it to that branch as well, the same way.
 
-Pull requests targeting a `release/*` branch are covered by `build-check.yml`, so
-a hotfix can go through review the same way a draft change does.
+### Hotfix without a pull request
+
+**When:** the fix is small and urgent, such as a broken link or a typo, and
+someone with push access to the release branch takes responsibility for it.
+Nobody reviews the change before it is live, so the local build is the only
+check. If `release/*` is protected against direct pushes, the push is rejected;
+use [Hotfix with a pull request](#hotfix-with-a-pull-request) instead.
+
+**Steps**
+
+1. Switch to the release branch and bring it up to date. `git switch` creates
+   the local branch from `origin/release/3.0.0` if it does not exist yet:
+
+   ```sh
+   git fetch origin
+   git switch release/3.0.0
+   git pull --ff-only
+   ```
+
+2. Make the fix under `src/` and commit it on its own, without the `config.js`
+   changes from the next step. A separate commit is what lets the fix be
+   cherry-picked to `main` later without the release metadata.
+
+3. Update the version-bearing entries from the
+   [`config.js` checklist](#configjs-checklist-draft-vs-release): `publishDate`,
+   `thisVersionURI`, `canonicalURI`, and the `otherLinks` rows, and bump the
+   patch version. Commit this separately. The branch name stays
+   `release/3.0.0`; the branch is the release line, and `config.js` records the
+   published version. If the correction is substantive enough to warrant a new
+   version number, create `release/3.0.1` from `release/3.0.0` as in
+   [Create a release](#create-a-release) instead; the two approaches differ in
+   whether `releases/3.0.0/` is rewritten or left standing.
+
+4. Build locally, then push. The push triggers `build-release.yml`, which
+   builds `release/3.0.0` and publishes it, exactly as it does for a new release
+   branch:
+
+   ```sh
+   mise run lint
+   git push
+   ```
+
+5. If the defect is also in the current draft, which it usually is, bring the
+   fix to `main` as in [Edit the current draft](#edit-the-current-draft),
+   cherry-picking only the fix commit from step 2. It goes through a pull
+   request there, so the draft still gets a review:
+
+   ```sh
+   git switch main
+   git pull
+   git switch -c fix/typo-from-3.0.0
+   git cherry-pick <fix-commit>
+   ```
+
+   Skipping this step means the next release ships the defect again.
+
+### Hotfix with a pull request
+
+**When:** the fix needs a second pair of eyes, is more than a trivial
+correction, or `release/*` is protected against direct pushes.
+
+**Steps**
+
+1. Branch from the release branch, not from `main`. Fetch first, so the release
+   branch is there even if it was created after the last fetch:
+
+   ```sh
+   git fetch origin
+   git switch -c fix/3.0.0-typo origin/release/3.0.0
+   ```
+
+   Any name that is not `main`, `release/*` or `gh-pages` works, as in
+   [Edit the current draft](#edit-the-current-draft).
+
+2. Commit the fix and the `config.js` changes as two separate commits, as in
+   steps 2 and 3 of
+   [Hotfix without a pull request](#hotfix-without-a-pull-request).
+
+3. Build locally, push the branch, and open a pull request against
+   `release/3.0.0`, not against `main`:
+
+   ```sh
+   mise run lint
+   git push -u origin fix/3.0.0-typo
+   ```
+
+   `build-check.yml` builds the pull request and publishes nothing; the built
+   `dist/` is attached to the run for review.
+
+4. Merge. `build-release.yml` then builds `release/3.0.0` and publishes it.
+
+5. Bring the fix commit to `main`, as in step 5 of
+   [Hotfix without a pull request](#hotfix-without-a-pull-request).
 
 ---
 

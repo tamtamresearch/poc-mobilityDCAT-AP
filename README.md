@@ -1,110 +1,230 @@
-# mobilityDCAT-AP - Repository Structure POC
+# mobilityDCAT-AP repository structure POC
 
-> **This is a proof of concept** demonstrating a proposed repository layout and GitHub Actions publishing workflow for mobilityDCAT-AP. It is not the authoritative specification repository.
->
-> The goal is to validate the branch-based versioning strategy before applying it to the main repo.
+[mobilityDCAT-AP](https://w3id.org/mobilitydcat-ap/releases/) is the
+[NAPCORE](https://napcore.eu/) application profile of DCAT-AP for describing
+mobility datasets, data services and services in the European National Access
+Points. This repository is a proof of concept, not the authoritative
+specification repository: it validates a proposed source layout, versioning
+convention and GitHub Actions publishing workflow before they are applied to
+[mobilityDCAT-AP/mobilityDCAT-AP](https://github.com/mobilityDCAT-AP/mobilityDCAT-AP).
 
-## Source files
+# Concepts
 
-All hand-authored source files live in `src/`. Generated artefacts go in `dist/` and must not be edited by hand.
+## Sources and build output
 
-Turtle is the source format for the ontology and the examples. The RDF/XML and JSON-LD serialisations are produced by the build and are never committed.
+The specification document is a [ReSpec](https://respec.org/) page,
+`src/index.html`, configured by `src/config.js`. ReSpec renders it into a static
+HTML page at build time.
 
-## Structure
+The ontology, `src/mobilitydcat-ap.ttl`, and the worked examples in
+`src/examples/` are written in Turtle, which is the source format. The RDF/XML
+and JSON-LD serialisations are produced by the build and never committed.
+
+The SHACL shapes in `src/shaclShapes/` are the validation constraints of the
+profile. The build checks the examples against them.
+
+Everything hand-authored lives in `src/`. The build writes everything it
+produces to `dist/`, which is emptied at the start of each build and must not be
+edited by hand.
 
 ```
 src/
 ├── index.html                 # ReSpec specification document (entry point)
-├── config.js                  # ReSpec configuration
-├── mobilitydcat-ap.ttl        # Ontology - primary source of truth (Turtle)
+├── config.js                  # ReSpec configuration: version, editors, dates, links
+├── mobilitydcat-ap.ttl        # Ontology, primary source of truth
 ├── tables/                    # HTML property tables included by index.html
-├── examples/                  # Worked examples (Turtle)
+├── examples/                  # Worked examples
 ├── figures/                   # UML diagrams and logo
 ├── shaclShapes/               # SHACL validation constraints
 ├── js/                        # Custom JavaScript
-├── scripts/                   # Build scripts (Python); see DEVELOPMENT.md
-├── enterpriseArchitectFiles/  # EA model (.qea)
+├── scripts/                   # Build scripts (Python), owned by this repository
+├── enterpriseArchitectFiles/  # Enterprise Architect model (.qea)
 └── appendices/                # Appendix content (placeholder)
 ```
+
+Apart from `src/scripts/`, the content of `src/` mirrors the upstream
+`drafts/latest`. It is kept identical so the proposed structure can be compared
+with upstream; specification changes are made upstream, not here.
+
+## Published versions
+
+Every built version is a directory on the `gh-pages` branch, served under
+`https://w3id.org/mobilitydcat-ap/`.
+
+The editor's draft, `drafts/latest/`, is always the current `main`.
+
+A draft snapshot, `drafts/X.Y.Z-draft.N/`, freezes the draft at a stable URL for
+a review round.
+
+A release, `releases/X.Y.Z/`, is a published version of the standard. It is
+built from a long-lived `release/X.Y.Z` branch, so it can be hotfixed later.
+
+The latest release, `releases/latest/`, is a copy of one release chosen by a
+person. The file `LATEST_RELEASE` on `main` records which version that is.
 
 ## Branching and naming convention
 
 | Ref | Kind | Goes to folder in gh-pages | Example |
 |-----|------|----------------------------|---------|
-| `main` | branch | `drafts/latest/` | - |
+| `main` | branch | `drafts/latest/` | |
 | `draft/X.Y.Z-draft.N[.C]` | tag | `drafts/X.Y.Z-draft.N[.C]/` | `draft/3.0.0-draft.1`, `draft/3.0.0-draft.1.1` |
 | `release/X.Y.Z` | branch | `releases/X.Y.Z/` | `release/3.0.0` |
 
-The rule in one sentence: a draft snapshot is tagged `draft/X.Y.Z-draft.N`, where
-`X.Y.Z` is the version the draft is working towards and `N` is the review round
-counting from 1, and a release is a `release/X.Y.Z` branch with no suffix.
+A draft snapshot is tagged `draft/X.Y.Z-draft.N`, where `X.Y.Z` is the version
+the draft is working towards and `N` is the review round counting from 1. A
+release is a `release/X.Y.Z` branch with no suffix. This matches how DCAT-AP
+labels its own drafts by target version.
 
-`N` may carry an optional second number, `draft.N.C`, for a correction published
-within the same review round - a typo found right after the snapshot went out,
-where opening a new review round would misrepresent what happened. Use it
+The optional `.C` in `draft.N.C` is a correction published within the same
+review round, such as a typo found right after the snapshot went out. Use it
 sparingly; the plain `draft.N` is the normal form.
 
-`X.Y.Z-draft.N` is a valid SemVer pre-release, so version ordering follows from
-the SemVer rules rather than from a local convention. Pre-release identifiers are
-compared left to right, `draft` equals `draft`, and the numeric ones compare
-numerically instead of as text. A longer set of identifiers sorts above a shorter
-one when everything before it is equal, which is what places a correction after
-the snapshot it corrects:
+`X.Y.Z-draft.N` is a valid SemVer pre-release, so versions order by the SemVer
+rules: numeric identifiers compare as numbers, and a longer identifier list
+sorts above a shorter one with the same prefix, which places a correction after
+the snapshot it corrects.
 
 ```
 3.0.0-draft.1  <  3.0.0-draft.1.1  <  3.0.0-draft.2  <  3.0.0-draft.10  <  3.0.0
 ```
 
-The convention also matches how DCAT-AP labels its own drafts by target version.
+CI enforces both patterns: `build-draft.yml` rejects a tag that does not match
+`^[0-9]+\.[0-9]+\.[0-9]+(-draft\.[0-9]+(\.[0-9]+)?)?$`, and `build-release.yml`
+rejects a branch that does not match `^[0-9]+\.[0-9]+\.[0-9]+$`.
 
-Both patterns are enforced in CI: `build-draft.yml` rejects a tag that does not
-match `^[0-9]+\.[0-9]+\.[0-9]+(-draft\.[0-9]+(\.[0-9]+)?)?$` and
-`build-release.yml` rejects a branch that does not match
-`^[0-9]+\.[0-9]+\.[0-9]+$`.
+## mise tasks
 
-Step-by-step procedures that use these refs are in [`PROCEDURES.md`](PROCEDURES.md).
+[mise](https://mise.jdx.dev/) pins the tool versions (Node.js and uv) and
+defines the build as named tasks in `.mise.toml`. CI runs the same tasks as a
+local build, so the two produce the same result.
 
-## GitHub Actions workflows
+# Installation
 
-Workflows live in `.github/workflows/` and publish to the `gh-pages` branch.
+Install [mise](https://mise.jdx.dev/getting-started.html), then in the project
+folder:
 
-| Workflow | Trigger | Publishes to |
-|----------|---------|-------------|
-| `build-main.yml` | push to `main` (src changes), manual | `drafts/latest/` |
-| `build-release.yml` | push to `release/*`, manual | `releases/X.Y.Z/` and `releases/latest/` if marked |
-| `build-draft.yml` | push of `draft/*` tag, manual | `drafts/X.Y.Z-draft.N[.C]/` |
-| `promote-latest.yml` | manual only | updates `LATEST_RELEASE` on `main` + copies already-built `releases/X.Y.Z/` to `releases/latest/` on `gh-pages` |
-| `build-check.yml` | push to any other branch, pull request to `main` or `release/*` (src changes), manual | nothing; `dist/` is uploaded as a run artifact only |
+```sh
+mise install        # Node.js and uv at the pinned versions
+mise run install    # npm install + uv sync
+```
 
-The build and deploy steps are split into two reusable workflows called by the above:
+`DEVELOPMENT.md` covers installing mise on Windows and Linux.
 
-| Reusable workflow | Purpose |
-|-------------------|---------|
-| `reusable-build.yml` | Full build pipeline through the mise tasks - `mise run build`, then `mise run check` (HTML validation, references, SHACL validation of the examples); uploads `dist/` as an artifact |
-| `reusable-publish-gh-pages.yml` | Pre-clean target directory on `gh-pages`, then deploy the artifact via plain `git` |
+# Configuration
 
-### Promoting a release to `releases/latest/`
+A local build needs no settings, credentials or environment variables.
 
-`LATEST_RELEASE` in the repo root (on `main`) holds the version number currently marked as latest (e.g. `1.0.0`). On every push to a `release/*` branch, `build-release.yml` reads this file from `main` - if the version matches the branch, it also deploys to `releases/latest/` automatically.
+| What | Where |
+|------|-------|
+| Tool versions and task definitions | `.mise.toml` |
+| ReSpec version | `package.json` |
+| Python dependencies | `pyproject.toml`, locked in `uv.lock` |
+| HTML validation rules | `.htmlvalidate.json` |
+| Version, dates and URLs shown in the specification | `src/config.js`; the values differ between a draft and a release, see `PROCEDURES.md`, section [`config.js` checklist: draft vs release](PROCEDURES.md#configjs-checklist-draft-vs-release) |
+| Which release `releases/latest/` points at | `LATEST_RELEASE` on `main`, changed through `promote-latest.yml` |
 
-This means:
-- Hotfixes to the current latest release branch update `releases/latest/` automatically, just like they update the versioned directory.
-- Hotfixes to older release branches only update their versioned directory - `releases/latest/` is untouched.
+Publishing needs a `gh-pages` branch in the GitHub repository, with GitHub Pages
+serving from it. The publish workflow checks that branch out and fails if it
+does not exist.
 
-To promote a different version to latest:
-
-- Run `promote-latest.yml` from the Actions tab and enter the version number.
-- It updates `LATEST_RELEASE` on `main` (so future hotfixes to that branch also update `releases/latest/`).
-- It also copies the already-built `releases/X.Y.Z/` to `releases/latest/` on `gh-pages` immediately - no rebuild needed.
-- Promotion is an explicit, deliberate step - no version silently becomes latest without a human decision.
+# Usage
 
 ## Building locally
 
-See `DEVELOPMENT.md` for prerequisites, setup, and build instructions.
+```sh
+mise run build      # serialise the Turtle and build the ReSpec page into dist/
+mise run lint       # build, then HTML validation, broken reference check and SHACL validation
+mise run serve      # serve the repository for a live ReSpec preview
+```
 
-## Editing and publishing
+Open `dist/index.html` to see the built specification. The individual steps and
+the expected output of the checks are in [`DEVELOPMENT.md`](DEVELOPMENT.md).
 
-See [`PROCEDURES.md`](PROCEDURES.md) for step-by-step procedures: editing the
-current draft, publishing a named draft snapshot for review, creating a release,
-promoting a release to latest, and hotfixing a published release. It also carries
-the `src/config.js` checklist for drafts and releases.
+## Procedures
+
+Every change to what is published follows one of five procedures. Each is
+summarised here; the full steps, checks and edge cases are in
+[`PROCEDURES.md`](PROCEDURES.md). Publishing a draft snapshot, creating a
+release and hotfixing one also involve setting the draft or release values in
+`src/config.js`, following `PROCEDURES.md`, section
+[`config.js` checklist: draft vs release](PROCEDURES.md#configjs-checklist-draft-vs-release).
+
+### Edit the current draft
+
+For any change that is not yet a release; the everyday case. Branch from
+`main`, edit under `src/`, run `mise run lint`, and open a pull request.
+`build-check.yml` builds the branch without publishing it and attaches `dist/`
+to the run for review. Merging to `main` refreshes `drafts/latest/`.
+Full procedure: `PROCEDURES.md`, section [Edit the current draft](PROCEDURES.md#edit-the-current-draft).
+
+### Publish a draft snapshot for review
+
+When a version of the draft has to stay at a stable URL, for reviewers or a
+meeting agenda. Tag the commit on `main` and push the tag:
+
+```sh
+git tag draft/3.0.0-draft.1
+git push origin draft/3.0.0-draft.1
+```
+
+`build-draft.yml` publishes `drafts/3.0.0-draft.1/`. A snapshot is never rebuilt
+or moved; if it is wrong, publish `draft.1.1` or `draft.2` instead.
+Full procedure: `PROCEDURES.md`, section [Publish a named draft snapshot for review](PROCEDURES.md#publish-a-named-draft-snapshot-for-review).
+
+### Create a release
+
+When a version is final. Merge the release values in `config.js` to `main`, then
+create the release branch from `main` and push it:
+
+```sh
+git switch -c release/3.0.0
+git push -u origin release/3.0.0
+```
+
+`build-release.yml` publishes `releases/3.0.0/`. The branch is long-lived and
+must not be deleted, because hotfixes are made on it.
+Full procedure: `PROCEDURES.md`, section [Create a release](PROCEDURES.md#create-a-release).
+
+### Promote a release to latest
+
+When a published release should become the one behind `releases/latest/`. This
+is always a manual decision: run `promote-latest.yml` from the Actions tab with
+the version number. It writes the version to `LATEST_RELEASE` on `main` and
+copies the already-built `releases/X.Y.Z/` to `releases/latest/` without
+rebuilding.
+Full procedure: `PROCEDURES.md`, section [Promote a release to `releases/latest/`](PROCEDURES.md#promote-a-release-to-releaseslatest).
+
+### Hotfix a published release
+
+When a correction has to reach a published release before the next version.
+There are two options. A small urgent fix can be committed straight to
+`release/X.Y.Z` and pushed, which publishes it without review; see
+`PROCEDURES.md`, section
+[Hotfix without a pull request](PROCEDURES.md#hotfix-without-a-pull-request).
+Otherwise, branch from `origin/release/X.Y.Z` and open a pull request against
+`release/X.Y.Z`; see `PROCEDURES.md`, section
+[Hotfix with a pull request](PROCEDURES.md#hotfix-with-a-pull-request).
+
+Either way, keep the fix in a commit separate from the version entries in
+`config.js`. Publishing rebuilds `releases/X.Y.Z/`, and also `releases/latest/`
+if `LATEST_RELEASE` names that version; a hotfix to an older release leaves
+`releases/latest/` alone. Cherry-pick the fix commit to `main` too, or the next
+release ships the defect again.
+Full procedure: `PROCEDURES.md`, section [Hotfix a published release](PROCEDURES.md#hotfix-a-published-release).
+
+## Workflows
+
+The procedures above trigger these workflows in `.github/workflows/`, which
+build the ref and write the result to `gh-pages`.
+
+| Workflow | Trigger | Publishes to |
+|----------|---------|-------------|
+| `build-main.yml` | push to `main` changing the build inputs, manual | `drafts/latest/` |
+| `build-draft.yml` | push of a `draft/*` tag, manual | `drafts/X.Y.Z-draft.N[.C]/` |
+| `build-release.yml` | push to `release/*`, manual | `releases/X.Y.Z/`, and `releases/latest/` if `LATEST_RELEASE` names this version |
+| `promote-latest.yml` | manual only | sets `LATEST_RELEASE` on `main` and copies the already-built `releases/X.Y.Z/` to `releases/latest/` |
+| `build-check.yml` | push to any other branch, pull request to `main` or `release/*`, manual | nothing; `dist/` is uploaded as a run artifact |
+
+All of them build through `reusable-build.yml`, which runs `mise run build` and
+then `mise run check`, and deploy through `reusable-publish-gh-pages.yml`, which
+empties the target directory before writing so no removed file survives.
