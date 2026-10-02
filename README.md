@@ -152,7 +152,19 @@ mise run lint       # build, then HTML validation, broken reference check and SH
 mise run serve      # static HTTP server on localhost:8080 for a live preview; no build
 ```
 
-Open `dist/index.html` to see the built specification.
+`mise run build` produces what CI publishes. It empties `dist/`, serialises the
+Turtle ontology and examples to RDF/XML and JSON-LD, copies the assets, and
+renders `src/index.html` with the ReSpec version pinned in `package.json` into
+`dist/index.html`; open that file to see the result. ReSpec prints
+"Network error loading highlighter" on every build; it is harmless, because the
+document has no code blocks to highlight.
+
+`mise run lint` is the check to run before pushing. It runs the build, then
+`mise run check`: HTML validation of `dist/index.html`, a list of broken local
+references, and SHACL validation of the examples. The first failure stops it,
+except the HTML validation, whose 1749 errors come from the ReSpec markup and
+are a baseline, not a failure. The first run downloads the SHACL imports into
+`.cache/`. `mise run check` alone re-runs the checks without rebuilding.
 
 `mise run serve` is for editing. It builds nothing; it serves the repository
 files so that ReSpec can render `src/index.html` in the browser. Open
