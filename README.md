@@ -149,13 +149,20 @@ Publishing depends on three things outside the repository files:
 ```sh
 mise run build      # serialise the Turtle and build the ReSpec page into dist/
 mise run lint       # build, then HTML validation, broken reference check and SHACL validation
-mise run serve      # serve the repository for a live ReSpec preview
+mise run serve      # static HTTP server on localhost:8080 for a live preview; no build
 ```
 
-Open `dist/index.html` to see the built specification. `mise run serve`
-renders the source instead, with ReSpec running in the browser and showing its
-warnings: open `http://localhost:8080/src/index.html`. The individual steps and
-the expected output of the checks are in [`DEVELOPMENT.md`](DEVELOPMENT.md).
+Open `dist/index.html` to see the built specification.
+
+`mise run serve` is for editing. It builds nothing; it serves the repository
+files so that ReSpec can render `src/index.html` in the browser. Open
+`http://localhost:8080/src/index.html` and reload after each edit; the badge at
+the top lists ReSpec's warnings. The preview loads the current ReSpec from
+w3.org rather than the pinned version the build uses, so it needs internet
+access and can occasionally differ from the build.
+
+The individual steps and the expected output of the checks are in
+[`DEVELOPMENT.md`](DEVELOPMENT.md).
 
 ## Procedures
 
