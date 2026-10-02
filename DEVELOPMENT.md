@@ -133,7 +133,7 @@ Turtle is the source format for the ontology and the examples. The `.rdf` and `.
 | `src/figures/` | UML diagrams |
 | `src/enterpriseArchitectFiles/` | Enterprise Architect model (`.qea`) |
 | `src/js/` | Custom JavaScript |
-| `src/appendices/` | Appendix content (placeholder) |
+| `src/appendices/` | Empty and unused, left over from GeoDCAT-AP; the appendices themselves are sections of `index.html` |
 | `src/scripts/` | Build scripts (Python) |
 
 ## Dependencies

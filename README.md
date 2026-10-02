@@ -40,7 +40,7 @@ src/
 ├── js/                        # Custom JavaScript
 ├── scripts/                   # Build scripts (Python), owned by this repository
 ├── enterpriseArchitectFiles/  # Enterprise Architect model (.qea)
-└── appendices/                # Appendix content (placeholder)
+└── appendices/                # Empty, unused; left over from GeoDCAT-AP
 ```
 
 Apart from `src/scripts/`, the content of `src/` mirrors the upstream
