@@ -1,4 +1,5 @@
 name: Build and publish — draft/* tag (drafts/X.Y.Z-draft.N)
+run-name: Publish snapshot ${{ github.ref_name }}
 
 # Triggered on push of any draft/* tag or manually.
 # Tag name convention: draft/X.Y.Z-draft.N — X.Y.Z is the version the draft

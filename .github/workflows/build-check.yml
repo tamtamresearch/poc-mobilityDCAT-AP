@@ -1,4 +1,5 @@
 name: Build check — branches and pull requests (no publish)
+run-name: "Check ${{ github.event_name == 'pull_request' && format('PR #{0} ({1})', github.event.number, github.head_ref) || github.ref_name }}"
 
 # Runs the full build pipeline on work that is not yet on main, without
 # publishing anything to gh-pages. The built dist/ is uploaded as an

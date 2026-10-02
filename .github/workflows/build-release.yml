@@ -1,4 +1,5 @@
 name: Build and publish — release/* (releases/X.Y.Z)
+run-name: Publish release ${{ github.ref_name }}
 
 # Triggered on push to any release/* branch or manually.
 # Branch name convention: release/X.Y.Z — no pre-release suffix; a draft

@@ -1,4 +1,5 @@
 name: Build and publish — main (drafts/latest)
+run-name: Publish drafts/latest
 
 # Triggered on every push to main (= the living draft) or manually.
 # Publishes to gh-pages under drafts/latest/.
