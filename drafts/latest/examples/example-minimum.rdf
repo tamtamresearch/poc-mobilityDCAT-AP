@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rdf:RDF
-  xmlns:dcat="http://www.w3.org/ns/dcat#"
   xmlns:dct="http://purl.org/dc/terms/"
+  xmlns:dcat="http://www.w3.org/ns/dcat#"
   xmlns:foaf="http://xmlns.com/foaf/0.1/"
   xmlns:mobilitydcatap="https://w3id.org/mobilitydcat-ap#"
   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -37,7 +37,7 @@
       <dcat:Distribution rdf:about="https://www.trafficdata.se/dataset/ec459578-a11f-4728-acaa-16b08ae45cfa/resource/4d2cccaf-219f-4fe6-a22c-d695ce86699d">
         <dcat:accessURL rdf:resource="http://www.trafikverket.se/tjanster/x/"/>
         <dct:rights>
-          <dct:RightsStatement rdf:nodeID="n4969fa2f45a641e384720e1563887492b1">
+          <dct:RightsStatement rdf:nodeID="nef69d41f24304fddb3ff1c69689e4655b1">
             <dct:type rdf:resource="https://w3id.org/mobilitydcat-ap/conditions-for-access-and-usage/licence-provided"/>
           </dct:RightsStatement>
         </dct:rights>
