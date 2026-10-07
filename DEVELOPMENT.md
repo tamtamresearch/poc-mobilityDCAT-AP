@@ -45,7 +45,7 @@ Individual steps:
 
 ```sh
 mise run clean        # empty dist/ (run automatically at the start of mise run build)
-mise run serialise    # convert src/*.ttl and src/examples/*.ttl -> dist/*.rdf + dist/*.jsonld
+mise run serialise    # convert src/*.ttl, src/examples/*.ttl and src/shaclShapes/*.ttl -> .rdf + .jsonld in dist/
 mise run build-spec   # copy assets to dist/ and build dist/index.html via ReSpec
 ```
 
@@ -109,7 +109,7 @@ Open `http://localhost:8080/src/index.html` in a browser. ReSpec runs live and s
 
 | Step | Script | What it does |
 |------|--------|-------------|
-| Serialise | `src/scripts/serialise.py` | Parses each `.ttl` with rdflib, writes `.rdf` and `.jsonld` to `dist/` |
+| Serialise | `src/scripts/serialise.py` | Parses each `.ttl` with rdflib, writes `.rdf` and `.jsonld` to `dist/`; writes lists of literals (`sh:languageIn`) as nested `rdf:first`/`rdf:rest`, which rdflib's pretty RDF/XML gets wrong, and falls back to flat RDF/XML if the output does not round-trip |
 | Copy assets | `src/scripts/copy-assets.py` | Copies the Turtle sources, examples, figures, and SHACL shapes to `dist/` |
 | Build spec | `src/scripts/build-spec.py` | Calls `respec --localhost`, which spins up its own HTTP server, builds `dist/index.html`, and shuts down |
 | Validate examples | `src/scripts/validate-examples.py` | Runs pyshacl on the examples; separate from the build |
@@ -120,7 +120,7 @@ Open `http://localhost:8080/src/index.html` in a browser. ReSpec runs live and s
 
 All hand-authored files live under `src/`. Never edit files in `dist/` — they are generated.
 
-Turtle is the source format for the ontology and the examples. The `.rdf` and `.jsonld` serialisations are generated on every build and are never committed.
+Turtle is the source format for the ontology, the examples and the SHACL shapes. The `.rdf` and `.jsonld` serialisations are generated on every build and are never committed.
 
 | Path | Purpose |
 |------|---------|

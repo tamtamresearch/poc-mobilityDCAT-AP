@@ -46,8 +46,8 @@ they are recorded as open actions in `NOTES-RESPONSE.md`.
 **Never edit `dist/`.** It is deleted and regenerated on every build. A fix
 applied there survives until the next build and no longer.
 
-**Never commit generated RDF.** Turtle is the source format for the ontology and
-the examples. The `.rdf` and `.jsonld` serialisations are produced by
+**Never commit generated RDF.** Turtle is the source format for the ontology,
+the examples and the SHACL shapes. The `.rdf` and `.jsonld` serialisations are produced by
 `serialise.py` into `dist/` on every build.
 
 ## Verifying a change

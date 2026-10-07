@@ -2,7 +2,7 @@
 """Copy source assets to dist/ before the ReSpec build.
 
 Only hand-authored files are copied. The RDF/XML and JSON-LD serialisations of
-the ontology and the examples are produced by serialise.py.
+the ontology, the examples and the SHACL shapes are produced by serialise.py.
 
 Run from repo root: python src/scripts/copy-assets.py
 """

@@ -21,7 +21,8 @@ The ontology, `src/mobilitydcat-ap.ttl`, and the worked examples in
 and JSON-LD serialisations are produced by the build and never committed.
 
 The SHACL shapes in `src/shaclShapes/` are the validation constraints of the
-profile. `mise run check`, run after the build, validates the examples against
+profile. They are also written in Turtle, and the build publishes them as
+RDF/XML and JSON-LD the same way. `mise run check`, run after the build, validates the examples against
 them.
 
 Everything hand-authored lives in `src/`. The build writes everything it
@@ -153,7 +154,7 @@ mise run serve      # static HTTP server on localhost:8080 for a live preview; n
 ```
 
 `mise run build` produces what CI publishes. It empties `dist/`, serialises the
-Turtle ontology and examples to RDF/XML and JSON-LD, copies the assets, and
+Turtle ontology, examples and SHACL shapes to RDF/XML and JSON-LD, copies the assets, and
 renders `src/index.html` with the ReSpec version pinned in `package.json` into
 `dist/index.html`; open that file to see the result. ReSpec prints
 "Network error loading highlighter" on every build; it is harmless, because the
